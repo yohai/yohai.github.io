@@ -1,8 +1,0 @@
-<div class="publications">
-  {% assign sorted_pubs = site.publications | sort: "date" %}
-  <ol>
-    {% for pub in sorted_pubs %}
-      <li> {% include pubformat.html %} </li>
-    {% endfor %}
-  </ol>
-</div>
