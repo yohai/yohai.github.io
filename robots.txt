@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://yohai.github.io/sitemap.xml
