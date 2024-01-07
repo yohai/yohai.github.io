@@ -41,13 +41,13 @@
    dynamics, localization properties and more.
 
 
-- name: "This could be you !"
-  title: "Drop me a line if you want to join:"
-  email: ybarsinai@gmail.com
-  photo: Graduation_hat.svg
-  info: >
-   Disclaimer: we don't have openings at this time, but suitable candidates 
-   will be considered.
+# - name: "This could be you !"
+#   title: "Drop me a line if you want to join:"
+#   email: ybarsinai@gmail.com
+#   photo: Graduation_hat.svg
+#   info: >
+#    Disclaimer: we don't have openings at this time, but suitable candidates 
+#    will be considered.
 
 
 - name: Théo Jules
