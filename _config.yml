@@ -268,8 +268,8 @@ display_categories: ['blockquotes'] # these categories will be displayed on the 
 
 scholar:
 
-  last_name: [Bar Sinai, Bar-Sinai]
-  first_name: [Yohai, Y.]
+  last_name: #[Bar Sinai, Bar-Sinai]
+  first_name: #[Yohai, Y.]
 
   style: apa
   locale: en
