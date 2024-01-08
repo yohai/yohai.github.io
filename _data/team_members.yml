@@ -28,7 +28,8 @@
   photo: Gal.jpg
   title: Master student
   info: >
-   Gal is working on the dynamics of deep neural networks. He's using tools from statistical physics to understand the dynamics of training and generalization in deep neural networks.
+   Gal is working on the dynamics of deep neural networks. He's using tools from statistical physics to understand 
+   the dynamics of training and generalization in deep neural networks.
 
 - name: Shachaf Rotem
   photo: shachaf.png
@@ -39,6 +40,13 @@
    He's using  [our recently developed formalism](https://doi.org/10.1073/pnas.1920237117), 
    to study disordered metamaterials and understand emergent phenomena such as the collapse
    dynamics, localization properties and more.
+
+- name: Ran Yaacoby
+  photo: Ran.jpg
+  title: PhD student
+  # email: shachafrotem@mail.tau.ac.il
+  info: >
+   Ran is studying the dynamics of deep neural networks.
 
 
 # - name: "This could be you !"
