@@ -190,6 +190,9 @@
           {%- if entry.talk %}
             <a href="{{ entry.talk }}" class="btn btn-sm z-depth-0" role="button">Talk</a>
           {%- endif %}
+          {%- if entry.openreview %}
+            <a href="{{ entry.openreview }}" class="btn btn-sm z-depth-0" role="button">Open Review</a>
+          {%- endif %}
           </div>
           {% if site.enable_publication_badges %}
           {% assign entry_has_altmetric_badge = entry.altmetric or entry.doi or  entry.eprint or entry.pmid or entry.isbn %}
