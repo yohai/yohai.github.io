@@ -1,0 +1,68 @@
+---
+layout: page
+---
+
+<!-- about.html -->
+      <div class="post">
+
+        <article>
+            <div class="clearfix">
+                <img style="max-width: 100%" src="/assets/img/group_icecream.png">
+            </div>
+
+            {% for profile in site.data.team_members %}
+                {%- unless profile.alumni %}
+                    <hr>
+                    <div class="profile float-{%- if profile.align == 'left' -%}left{%- else -%}right{%- endif -%}">
+                        {%- if profile.photo %}
+                        {%- assign profile_image_path = profile.photo | prepend: 'assets/img/' -%}
+                        
+                        {%- assign profile_image_class = "img-fluid z-depth-1 rounded" -%}
+                        
+
+                        {% include figure.liquid
+                        path=profile_image_path
+                        class=profile_image_class
+                        alt=profile.image -%}
+                        {% endif -%}
+                        {%- if profile.more_info %}
+                        <div class="more-info">
+                        {{ profile.more_info }}
+                        </div>
+                        {%- endif %}
+                    </div>
+                    
+                    <div class="clearfix">
+                        <h2> {{ profile.name }} </h2>
+                        <span>
+                            <h5> 
+                                {{ profile.title }}
+                                {%- if profile.email %}
+                                    <a href="mailto:{{ profile.email }}"><i class="fas fa-envelope" style='padding-left: 10px;'></i></a></p>
+                                {%- endif %}
+                            </h5>
+                            <div>
+                                {{ profile.info | markdownify }}
+                            </div>
+                        </span>
+                    </div>
+                {%- endunless %}  
+            {% endfor %}
+            <hr/>
+            <div class="clearfix">
+                <img style="max-width: 100%" src="/assets/img/group_spring.jpg">
+            </div>
+            <hr/>
+          <h2> Alumni </h2>
+          <ul>
+              {% for profile in site.data.team_members %}
+                {%- if profile.alumni %}
+                    <li>
+                        {{ profile.name }}, {{ profile.title }}, {{ profile.years }}
+                    </li>
+                {% endif %}
+              {% endfor %}
+          </ul>
+        </article>
+
+</div>
