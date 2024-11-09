@@ -4,6 +4,19 @@ title: Visualization of complex functions
 permalink: /complex
 description: 
 ---
+## Logarithm
+This is a plot of the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
+<img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
+
+Here's how the exponent/log function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="slider-container me-3 text-start">
+        <label for="t" class="form-label">t= <span id="tValue">0.0</span></label>
+        <input type="range" class="form-range" id="t" min="0" max="1" step="0.05" value="0">
+    </div>
+</div>
+<svg id="expchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
 ## Powers and roots
 
@@ -26,12 +39,11 @@ In this case, the complex plane maps onto itself exactly α times.
 <div class="button-container text-center">
     <button id="restoreDefaults" class="btn btn-primary">Restore Defaults</button>
 </div>
-<svg id="powerchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
+<svg id="powerchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
 Another way to look at it: raising to the power \\(α\\) is equivalent to
 \\( z^\alpha = e^{\alpha \log z}\\). 
 What you're seeing when looking at fractional powers is the same branch cut of the imaginary part of the logarithm.
-
 
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -43,7 +55,8 @@ What you're seeing when looking at fractional powers is the same branch cut of t
     const H = 3;
     const coarse = 0.5;
     const fine = 0.03;
-
+</script>
+<script>
     const defaultAlpha = 1.0;
     const defaultBranchAngle = 180;
 
@@ -159,4 +172,63 @@ What you're seeing when looking at fractional powers is the same branch cut of t
     alphaInput.on("input", handleInput);
     branchAngleInput.on("input", handleInput);
     restoreButton.on("click", restoreDefaults);
+</script>  
+
+<script>
+    // complex plane under f(z)=exp(z)
+    const xScaleExp = d3.scaleLinear().domain([-Math.PI, Math.PI]).range([0, width]);
+    const yScaleExp = d3.scaleLinear().domain([-Math.PI,Math.PI]).range([height, 0]);
+
+    const svgExp = d3.select("#expchart");
+
+
+    function genPointsExp(){
+        const hlinesExp = [];
+        const vlinesExp = [];
+        for (let x = -W; x <= W; x += fine) {
+            for (let y = -H; y <= H; y += coarse) hlinesExp.push([x, y]);
+        }
+        for (let x = -W; x <= W; x += coarse) {
+            for (let y = -H; y <= H; y += fine) vlinesExp.push([x, y]);
+        }
+        return { hlinesExp, vlinesExp };
+    }
+
+    function fexp(points, t) {
+        return points.map((p, _) => [
+            t * Math.exp(p[0]) * Math.cos(p[1]) + (1-t) * p[0],
+            t * Math.exp(p[0]) * Math.sin(p[1]) + (1-t) * p[1],
+        ]);
+    }
+
+    function drawPointsExp(points, color) {
+        svgExp.selectAll(`.pointExp-${color}`)
+            .data(points)
+            .join("circle")
+            .attr("class", `pointExp-${color}`)
+            .attr("cx", d => xScaleExp(d[0]))
+            .attr("cy", d => yScaleExp(d[1]))
+            .attr("r", 1.5)
+            .attr("fill", color);
+    }
+
+    const { hlinesExp, vlinesExp } = genPointsExp();
+    function updateExp(t) {
+        const hPointsExp = fexp(hlinesExp, t);
+        const vPointsExp = fexp(vlinesExp, t);
+        drawPointsExp(hPointsExp, "blue");
+        drawPointsExp(vPointsExp, "red");
+    }
+
+    updateExp(0.0);
+
+    const tInput = d3.select("#t");
+    const tValue = d3.select("#tValue");
+
+    function handleInputExp() {
+        const t = +tInput.node().value;
+        tValue.text(t.toFixed(1));
+        updateExp(t);
+    }
+    tInput.on("input", handleInputExp);
 </script> 
