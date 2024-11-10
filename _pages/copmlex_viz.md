@@ -8,7 +8,8 @@ description:
 This is a plot of the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
 <img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
 
-Here's how the exponent/log function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
+Here's how the log function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
+Here's how the exponent function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
 
 <div class="d-flex justify-content-between mb-3">
     <div class="slider-container me-3 text-start">
@@ -18,6 +19,7 @@ Here's how the exponent/log function warps the complex plane. Each point \\(z\\)
 </div>
 <svg id="expchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
+Note that when you gor ftom \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane.
 ## Powers and roots
 
 Here you can see how the complex plane maps to itself under \\( f(z)=z^{\alpha} \\), for various \\(α\\)s and choices of the branch cut.
