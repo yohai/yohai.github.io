@@ -32,16 +32,6 @@
    Gal is working on the dynamics of deep neural networks. He's using tools from statistical physics to understand 
    the dynamics of training and generalization in deep neural networks.
 
-- name: Shachaf Rotem
-  photo: shachaf.png
-  title: Master student
-  email: shachafrotem@mail.tau.ac.il
-  info: >
-   Shachaf is looking at a geometrical description of soft mechanical meta-materials. 
-   He's using  [our recently developed formalism](https://doi.org/10.1073/pnas.1920237117), 
-   to study disordered metamaterials and understand emergent phenomena such as the collapse
-   dynamics, localization properties and more.
-
 - name: Ran Yaacoby
   photo: Ran.jpg
   title: PhD student
@@ -82,3 +72,16 @@
     Amit is looking at the random dynamics of interacting colloidal particles
     to see what we can learn about their interactions from their kinematics. 
     This work is in collaboration with [Roy Beck's lab](https://www.becklab.sites.tau.ac.il/).
+
+
+- name: Shachaf Rotem
+  photo: shachaf.png
+  title: Master student
+  years: 2021-2024
+  email: shachafrotem@mail.tau.ac.il
+  alumni: true
+  info: >
+   Shachaf is looking at a geometrical description of soft mechanical meta-materials. 
+   He's using  [our recently developed formalism](https://doi.org/10.1073/pnas.1920237117), 
+   to study disordered metamaterials and understand emergent phenomena such as the collapse
+   dynamics, localization properties and more.
