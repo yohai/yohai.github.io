@@ -5,18 +5,22 @@ permalink: /complex
 description: 
 ---
 ## Logarithm
-This is a plot of the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
+The complex logarithm separates the absolute value and the phase of a complex number, 
+\\[\log z = \log\left(R e^{i\phi}\right)=\log R+i\phi\\]
+The angle \\(\phi\\) is conventionally defined to be between \\(-\pi\\) and \\(\pi\\). This is an arbitrary choice of a branch cut. Here you can see 
+the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
 <img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
+The choice \\(-\pi<\phi<\pi\\) corresponds to the yellow sheet.
 
-Here's how the log function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
-Here's how the exponent function warps the complex plane. Each point \\(z\\) moves in a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
+It's also insightful to see how the log function warps the complex plane. In this widget, every point \\(z\\) moves on a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
 
-<div class="d-flex justify-content-between mb-3">
-    <div class="slider-container me-3 text-start">
+<div class="d-flex justify-content-center mb-3">
+    <div class="slider-container text-center">
         <label for="t" class="form-label">t= <span id="tValue">0.0</span></label>
         <input type="range" class="form-range" id="t" min="0" max="1" step="0.05" value="0">
+        <span style="font-size:12px">⬅️  slide me!</span>
     </div>
-</div>
+</div>   
 <svg id="expchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
 Note that when you go from \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane.
