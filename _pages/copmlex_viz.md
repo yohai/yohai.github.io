@@ -19,7 +19,7 @@ Here's how the exponent function warps the complex plane. Each point \\(z\\) mov
 </div>
 <svg id="expchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
-Note that when you gor ftom \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane.
+Note that when you go from \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane.
 
 ## Powers and roots
 
