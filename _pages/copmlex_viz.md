@@ -44,6 +44,7 @@ In this case, the complex plane maps onto itself exactly α times.
 Another way to look at it: raising to the power \\(α\\) is equivalent to
 \\( z^\alpha = e^{\alpha \log z}\\). 
 What you're seeing when looking at fractional powers is the same branch cut of the imaginary part of the logarithm.
+When \\(alpha\\) is an integer, the branch cut exactly closes off. 
 
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
