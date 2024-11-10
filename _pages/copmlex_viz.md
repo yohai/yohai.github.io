@@ -65,6 +65,19 @@ When \\(alpha\\) is an integer, the branch cut exactly closes off.
     const yScale = d3.scaleLinear().domain([-5, 5]).range([height, 0]);
 
     const svg = d3.select("#powerchart");
+    svg.append("g")
+        .attr("transform", `translate(0,${height / 2})`)
+        .call(d3.axisBottom(xScale).tickValues([-4, -3, -2, -1, 1, 2, 3, 4]))
+        .attr("stroke-width", 2)
+        .selectAll("text")
+        .style("font-size", "20px");
+
+    svg.append("g")
+        .attr("transform", `translate(${width / 2},0)`)
+        .call(d3.axisLeft(yScale).tickValues([-4, -3, -2, -1, 1, 2, 3, 4]))
+        .attr("stroke-width", 2)
+        .selectAll("text")
+        .style("font-size", "20px");
 
     function genPoints(W, H, coarse, fine) {
         const hlines = [];
@@ -177,20 +190,43 @@ When \\(alpha\\) is an integer, the branch cut exactly closes off.
 
 <script>
     // complex plane under f(z)=exp(z)
-    const xScaleExp = d3.scaleLinear().domain([-Math.PI, Math.PI]).range([0, width]);
-    const yScaleExp = d3.scaleLinear().domain([-Math.PI,Math.PI]).range([height, 0]);
+    const xScaleExp = d3.scaleLinear().domain([-4.5, 4.5]).range([0, width]);
+    const yScaleExp = d3.scaleLinear().domain([-4.5, 4.5]).range([height, 0]);
 
     const svgExp = d3.select("#expchart");
+    
+    //Add Axes
+    svgExp.append("g")
+        .attr("transform", `translate(0,${height / 2})`)
+        .call(d3.axisBottom(xScaleExp).tickValues([-Math.PI, Math.PI]).tickFormat(d => {
+            if (d === -Math.PI) return "-π";
+            if (d === Math.PI) return "π";
+            return d;
+        }))
+        .attr("stroke-width", 2)
+        .selectAll("text")
+        .style("font-size", "20px");
 
+    svgExp.append("g")
+        .attr("transform", `translate(${width / 2},0)`)
+        .call(d3.axisLeft(yScaleExp).tickValues([-Math.PI, Math.PI]).tickFormat(d => {
+            if (d === -Math.PI) return "-π";
+            if (d === Math.PI) return "π";
+            return d;
+        }))
+        .attr("stroke-width", 2)
+        .selectAll("text")
+        .style("font-size", "20px");
 
     function genPointsExp(){
         const hlinesExp = [];
         const vlinesExp = [];
-        for (let x = -W; x <= W; x += fine) {
-            for (let y = -H; y <= H; y += coarse) hlinesExp.push([x, y]);
+        const coarseExp = Math.PI/10;
+        for (let x = -Math.PI; x <= Math.PI; x += fine) {
+            for (let y = -Math.PI; y <= Math.PI; y += coarseExp) hlinesExp.push([x, y]);
         }
-        for (let x = -W; x <= W; x += coarse) {
-            for (let y = -H; y <= H; y += fine) vlinesExp.push([x, y]);
+        for (let x = -Math.PI; x <= Math.PI; x += coarseExp) {
+            for (let y = -Math.PI; y <= Math.PI; y += fine) vlinesExp.push([x, y]);
         }
         return { hlinesExp, vlinesExp };
     }
@@ -219,6 +255,7 @@ When \\(alpha\\) is an integer, the branch cut exactly closes off.
         const vPointsExp = fexp(vlinesExp, t);
         drawPointsExp(hPointsExp, "blue");
         drawPointsExp(vPointsExp, "red");
+        svgExp.selectAll("g").raise();
     }
 
     updateExp(0.0);
