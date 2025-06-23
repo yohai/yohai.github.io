@@ -301,3 +301,10 @@ function drawTicks(p, ctx) {
     ctx.fillText(p.labels[i], p.center.x + 8, y);
   }
 }
+
+
+document.querySelectorAll('.radio-buttons label').forEach(label => {
+  label.addEventListener('mousedown', e => e.stopPropagation(), true);
+  label.addEventListener('mouseup', e => e.stopPropagation(), true);
+  label.addEventListener('mousemove', e => e.stopPropagation(), true);
+});

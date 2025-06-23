@@ -15,22 +15,55 @@
     touch-action: none;
   }
 
+  div.radio-buttons {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    background: rgba(255,255,255,0.95);
+    padding: 4px 6px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;    /* 👈 stack items vertically */
+    gap: 0.25em;               /* space between buttons */
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    height: 80px;
+    pointer-events: none;
+    display:flex
+  }
+
+  .radio-buttons label {
+    pointer-events: auto; 
+  }
   .arrow-block {
     width: 100px;
     flex-shrink: 0;
     z-index: 1; /* allow overflow visibility */
   }
+  @media (max-width: 600px) {
+  #container-that-must-not-be-narrow {
+    display: none !important;
+  }
+  #narrow-warning {
+    display: block !important;
+  }
+}
 </style>
 
-<div class="container my-5">
+<div class="container my-5"  id="container-that-must-not-be-narrow">
   <div class="d-flex justify-content-between align-items-center flex-nowrap overflow-auto">
 
     <!-- Left Canvas -->
     <div class="canvas-wrapper">
-      <div style="position: absolute; top: 8px; left: 8px; z-index: 2; background: rgba(255,255,255,0.9); padding: 4px; border-radius: 4px; font-size: 0.9em;">
-        <label><input type="radio" name="logMode" value="branchcut" checked> log has branchcut</label>
-        <label><input type="radio" name="logMode" value="multivalued"> log is multivalued</label><br>
-      </div>  
+      <div class="radio-buttons">
+        <label style="white-space: nowrap;"><input type="radio" name="logMode" value="branchcut" checked> log has a branch-cut</label>
+        <label style="white-space: nowrap;"><input type="radio" name="logMode" value="multivalued"> log is multivalued</label>
+      </div>
       <canvas id="canvas1"></canvas>
     </div>
 
@@ -53,7 +86,7 @@
     <!-- Right Canvas -->
     <div class="canvas-wrapper">
       <canvas id="canvas2"></canvas>
-      <div style="position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(255,255,255,0.9); padding: 4px; border-radius: 4px; font-size: 0.9em;">
+      <div class="radio-buttons">
         <label><input type="radio" name="gridMode" value="cartesian" checked> Cartesian</label>
         <label><input type="radio" name="gridMode" value="polar"> Polar</label>
       </div>
@@ -70,4 +103,7 @@
       </marker>
     </defs>
   </svg>
+</div>
+<div id="narrow-warning" style="display: none; background: #eee; color: #555; text-align: center; padding: 2em; border-radius: 8px;">
+  Please view this on a wider screen (e.g., hold your phone sideways).
 </div>
