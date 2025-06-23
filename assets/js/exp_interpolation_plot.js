@@ -1,31 +1,48 @@
 // complex plane under f(z)=exp(z)
-const xScaleExp = d3.scaleLinear().domain([-4.5, 4.5]).range([0, width]);
-const yScaleExp = d3.scaleLinear().domain([-4.5, 4.5]).range([height, 0]);
 
 const svgExp = d3.select("#expchart");
+const width =  600;
+const height = 600;
 
-//Add Axes
-svgExp.append("g")
-    .attr("transform", `translate(0,${height / 2})`)
-    .call(d3.axisBottom(xScaleExp).tickValues([-Math.PI, Math.PI]).tickFormat(d => {
-        if (d === -Math.PI) return "-π";
-        if (d === Math.PI) return "π";
-        return d;
-    }))
-    .attr("stroke-width", 2)
-    .selectAll("text")
-    .style("font-size", "20px");
+// Scales: domain = math coords, range = screen coords
+const xScaleExp = d3.scaleLinear()
+  .domain([-4.5, 4.5])
+  .range([0, width]);
 
-svgExp.append("g")
-    .attr("transform", `translate(${width / 2},0)`)
-    .call(d3.axisLeft(yScaleExp).tickValues([-Math.PI, Math.PI]).tickFormat(d => {
-        if (d === -Math.PI) return "-π";
-        if (d === Math.PI) return "π";
-        return d;
-    }))
-    .attr("stroke-width", 2)
-    .selectAll("text")
-    .style("font-size", "20px");
+const yScaleExp = d3.scaleLinear()
+  .domain([-4.5, 4.5])
+  .range([height, 0]);
+
+// Clear if needed
+svgExp.selectAll("*").remove();
+
+// Wrapper group for all elements
+const g = svgExp.append("g");
+
+// X Axis (horizontal) at y = 0
+g.append("g")
+  .attr("transform", `translate(0, ${yScaleExp(0)})`)
+  .call(
+    d3.axisBottom(xScaleExp)
+      .tickValues([-Math.PI, Math.PI])
+      .tickFormat(d => d === -Math.PI ? "-π" : d === Math.PI ? "π" : d)
+  )
+  .attr("stroke-width", 2)
+  .selectAll("text")
+  .style("font-size", "20px");
+
+// Y Axis (vertical) at x = 0
+g.append("g")
+  .attr("transform", `translate(${xScaleExp(0)}, 0)`)
+  .call(
+    d3.axisLeft(yScaleExp)
+      .tickValues([-Math.PI, Math.PI])
+      .tickFormat(d => d === -Math.PI ? "-π" : d === Math.PI ? "π" : d)
+  )
+  .attr("stroke-width", 2)
+  .selectAll("text")
+  .style("font-size", "20px");
+
 
 function genLinesExp() {
     const hlinesExp = [];
@@ -34,7 +51,7 @@ function genLinesExp() {
     // Horizontal lines (each line is a set of fixed y with varying x)
     for (let y = -Math.PI; y <= Math.PI; y += coarseExp) {
         const hline = [];
-        for (let x = -Math.PI; x <= Math.PI; x += fine) {
+        for (let x = -Math.PI; x <= Math.PI; x += 0.04) {
             hline.push([x, y]);
         }
         hlinesExp.push(hline);
@@ -43,7 +60,7 @@ function genLinesExp() {
     // Vertical lines (each line is a set of fixed x with varying y)
     for (let x = -Math.PI; x <= Math.PI; x += coarseExp) {
         const vline = [];
-        for (let y = -Math.PI; y <= Math.PI; y += fine) {
+        for (let y = -Math.PI; y <= Math.PI; y += 0.04) {
             vline.push([x, y]);
         }
         vlinesExp.push(vline);
@@ -75,8 +92,8 @@ function updateExp(t) {
 }
 function drawLines(lines, color) {
     const lineGenerator = d3.line()
-        .x(d => xScale(d[0]))
-        .y(d => yScale(d[1]));
+        .x(d => xScaleExp(d[0]))
+        .y(d => yScaleExp(d[1]));
 
     svgExp.selectAll(`.line-${color}`)
         .data(lines)

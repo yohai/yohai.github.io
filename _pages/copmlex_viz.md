@@ -12,6 +12,11 @@ the real and imaginary part of the logarithm Riemann surface. That is, we plot \
 <img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
 The choice \\(-\pi<\phi<\pi\\) corresponds to the yellow sheet.
 
+A nice way to visualize this is tracking a single point under the exp/log mapping. Drag either of the points below (if you're on a phone, better to hold it horizontally (landscape)):
+
+{% include two_paenls_log_exp.html %}
+
+
 It's also insightful to see how the log function warps the complex plane. In this widget, every point \\(z\\) moves on a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
 
 <div class="d-flex justify-content-center mb-3">
@@ -58,5 +63,6 @@ When \\(alpha\\) is an integer, the branch cut exactly closes off.
 
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="{{ '/assets/js/power_plot.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/exp_interpolation_plot.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/power_plot.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/exp_interpolation_plot.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/two_paenls_log_exp.js' | relative_url }}"></script>

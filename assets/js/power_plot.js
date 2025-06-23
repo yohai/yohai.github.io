@@ -9,8 +9,8 @@ const fine = 0.03;
 const defaultAlpha = 1.0;
 const defaultBranchAngle = 180;
 
-const xScale = d3.scaleLinear().domain([-4, 4]).range([0, width]);
-const yScale = d3.scaleLinear().domain([-4, 4]).range([height, 0]);
+const xScale = d3.scaleLinear().domain([-4.5, 4.5]).range([0, width]);
+const yScale = d3.scaleLinear().domain([-4.5, 4.5]).range([height, 0]);
 
 const svg = d3.select("#powerchart");
 // make axes
