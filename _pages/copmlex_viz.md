@@ -16,6 +16,13 @@ A nice way to visualize this is tracking a single point under the exp/log mappin
 
 {% include two_paenls_log_exp.html %}
 
+Things to try/notice:
+
+1. Note that when dragging the red point, the blue point always moves continuously, but when dragging the blue point the red point jumps discontinuously when crossing the branch cut (which here is chosen to be the negative real axis).
+1. Drag the blue point in a small path that does not encircle the origin.
+1. Drag the blue point in a small path that encircles the origin. Try both clockwise and anti-clockwise.
+1. Try to drag the red dot such that the blue dot follows a vertical/horizontal line.
+ 
 
 It's also insightful to see how the log function warps the complex plane. In this widget, every point \\(z\\) moves on a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
 

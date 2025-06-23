@@ -1,6 +1,7 @@
 <style>
   .canvas-wrapper {
     width: 46%;
+    min-width: 250px;
     aspect-ratio: 1 / 1;
     position: relative;
   }
@@ -11,6 +12,7 @@
     display: block;
     border: 1px solid #ccc;
     border-radius: 8px;
+    touch-action: none;
   }
 
   .arrow-block {
@@ -47,6 +49,10 @@
     <!-- Right Canvas -->
     <div class="canvas-wrapper">
       <canvas id="canvas2"></canvas>
+      <div style="position: absolute; top: 8px; right: 8px; z-index: 2; background: rgba(255,255,255,0.9); padding: 4px; border-radius: 4px; font-size: 0.9em;">
+        <label><input type="radio" name="gridMode" value="cartesian" checked> Cartesian</label>
+        <label><input type="radio" name="gridMode" value="polar"> Polar</label>
+      </div>
     </div>
 
   </div>

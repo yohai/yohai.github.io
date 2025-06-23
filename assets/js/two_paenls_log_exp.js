@@ -1,201 +1,281 @@
 const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
 
-function resizeCanvas(canvas) {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-}
-
-resizeCanvas(canvas1);
-resizeCanvas(canvas2);
-
-const ctx1 = canvas1.getContext("2d");
-const ctx2 = canvas2.getContext("2d");
-
-// Update these after resizing
-const width = canvas1.width;
-const height = canvas1.height;
-let center = { x: width / 2, y: height / 2 };
 const radius = 8.5;
-const scale = 30;
 
-const intTicks = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
-const intLabels = intTicks.map(n => n.toString());
-const piTicks = [-2 * Math.PI, -Math.PI, 0, Math.PI, 2 * Math.PI];
-const piLabels = ["-2π", "-π", "0", "π", "2π"];
+// Parameters per canvas
+const canvasParams = {
+  canvas1: {
+    canvas: canvas1,
+    ctx: canvas1.getContext("2d"),
+    ticks: [-2 * Math.PI, -Math.PI, 0, Math.PI, 2 * Math.PI],
+    labels: ["-2π", "-π", "0", "π", "2π"],
+    center: { x: 0, y: 0 },
+    toCanvasCoords: null,
+    fromCanvasCoords: null,
+    logicalWidth: 4.2 * Math.PI,
+  },
+  canvas2: {
+    canvas: canvas2,
+    ctx: canvas2.getContext("2d"),
+    ticks:  [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12, 15],
+    labels:  [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12, 15].map(n => n.toString()),
+    center: { x: 0, y: 0 },
+    toCanvasCoords: null,
+    fromCanvasCoords: null,
+    gridMode: 'cartesian',
+    logicalWidth: 33,
+  }
+};
 
+// Shared state
 let z = { x: 1, y: 1 };
-function drawGrid(ctx, values, labels) {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.save();
 
-    // 1. Full-range grid lines at integer steps
-    ctx.strokeStyle = "#eee";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
+function resizeCanvas(p) {
+  const rect = p.canvas.getBoundingClientRect();
+  p.canvas.width = rect.width;
+  p.canvas.height = rect.height;
+  p.center = { x: rect.width / 2, y: rect.height / 2 };
+  p.scale = p.canvas.width / p.logicalWidth;
 
-    const xStart = -Math.ceil(center.x / scale);
-    const xEnd = Math.ceil((ctx.canvas.width - center.x) / scale);
-    for (let i = xStart; i <= xEnd; i++) {
-        const x = center.x + i * scale;
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, ctx.canvas.height);
-    }
+  p.toCanvasCoords = (z) => ({
+    x: p.center.x + z.x * p.scale,
+    y: p.center.y - z.y * p.scale
+  });
 
-    const yStart = -Math.ceil(center.y / scale);
-    const yEnd = Math.ceil((ctx.canvas.height - center.y) / scale);
-    for (let i = yStart; i <= yEnd; i++) {
-        const y = center.y + i * scale;
-        ctx.moveTo(0, y);
-        ctx.lineTo(ctx.canvas.width, y);
-    }
-
-    ctx.stroke();
-
-    // 2. Axes
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, center.y);
-    ctx.lineTo(ctx.canvas.width, center.y);
-    ctx.moveTo(center.x, 0);
-    ctx.lineTo(center.x, ctx.canvas.height);
-    ctx.stroke();
-
-    // 3. Tick marks at given values
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let i = 0; i < values.length; i++) {
-        const x = center.x + values[i] * scale;
-        ctx.moveTo(x, center.y - 5);
-        ctx.lineTo(x, center.y + 5);
-
-        const y = center.y + values[i] * scale;
-        ctx.moveTo(center.x - 5, y);
-        ctx.lineTo(center.x + 5, y);
-    }
-    ctx.stroke();
-
-    // 4. Labels
-    // X-axis labels (centered below tick)
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-    for (let i = 0; i < values.length; i++) {
-        const x = center.x + values[i] * scale;
-        if (Math.abs(values[i]) < 1e-6) continue;
-        ctx.fillText(labels[i], x, center.y + 8);
-    }
-
-    // Y-axis labels (vertically centered)
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-    for (let i = 0; i < values.length; i++) {
-        const y = center.y - values[i] * scale;
-        if (Math.abs(values[i]) < 1e-6) continue;
-        ctx.fillText(labels[i], center.x + 8, y);
-    }
-
-    ctx.restore();
+  p.fromCanvasCoords = (pt) => ({
+    x: (pt.x - p.center.x) / p.scale,
+    y: (p.center.y - pt.y) / p.scale
+  });
 }
 
 
-function toCanvasCoords(z) {
-    return {
-    x: center.x + z.x * scale,
-    y: center.y - z.y * scale,
-    };
+function drawGrid(p) {
+  const ctx = p.ctx;
+  ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+  ctx.save();
+
+  // Light grid lines
+  ctx.strokeStyle = "#eee";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+
+  const xStart = -Math.ceil(p.center.x / p.scale);
+  const xEnd = Math.ceil((p.canvas.width - p.center.x) / p.scale);
+  for (let i = xStart; i <= xEnd; i++) {
+    const x = p.center.x + i * p.scale;
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, p.canvas.height);
+  }
+
+  const yStart = -Math.ceil(p.center.y / p.scale);
+  const yEnd = Math.ceil((p.canvas.height - p.center.y) / p.scale);
+  for (let i = yStart; i <= yEnd; i++) {
+    const y = p.center.y + i * p.scale;
+    ctx.moveTo(0, y);
+    ctx.lineTo(p.canvas.width, y);
+  }
+
+  ctx.stroke();
+
+  // Axes
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, p.center.y);
+  ctx.lineTo(p.canvas.width, p.center.y);
+  ctx.moveTo(p.center.x, 0);
+  ctx.lineTo(p.center.x, p.canvas.height);
+  ctx.stroke();
+
+  drawTicks(p, ctx);
+  ctx.restore();
 }
 
-function fromCanvasCoords(p) {
-    return {
-    x: (p.x - center.x) / scale,
-    y: (center.y - p.y) / scale,
-    };
-}
+function drawPolarGrid(p) {
+  const ctx = p.ctx;
+  ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+  ctx.save();
 
-function drawPoint(ctx, z, color = "red") {
-    const p = toCanvasCoords(z);
+  // Radial circles
+  ctx.strokeStyle = "#eee";
+  ctx.lineWidth = 1;
+
+  const maxR = Math.min(p.canvas.width, p.canvas.height)/1.141;
+  const step = p.scale;
+
+  for (let r = step; r < maxR; r += step) {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
+    ctx.arc(p.center.x, p.center.y, r, 0, 2 * Math.PI);
+    ctx.stroke();
+  }
+
+  // Radial lines
+  for (let angle = 0; angle < 360; angle += 30) {
+    const rad = angle * Math.PI / 180;
+    const x = p.center.x + Math.cos(rad) * maxR;
+    const y = p.center.y - Math.sin(rad) * maxR;
+    ctx.beginPath();
+    ctx.moveTo(p.center.x, p.center.y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, p.center.y);
+  ctx.lineTo(p.canvas.width, p.center.y);
+  ctx.moveTo(p.center.x, 0);
+  ctx.lineTo(p.center.x, p.canvas.height);
+  ctx.stroke();
+    
+  drawTicks(p, ctx);
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i < p.ticks.length; i++) {
+    const y = p.center.y - p.ticks[i] * p.scale;
+    if (Math.abs(p.ticks[i]) < 1e-6) continue;
+    ctx.fillText(p.labels[i], p.center.x + 8, y);
+  }
+
+  ctx.restore();
+}
+
+function drawTicks(p, ctx) {
+    // Ticks
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < p.ticks.length; i++) {
+    const x = p.center.x + p.ticks[i] * p.scale;
+    ctx.moveTo(x, p.center.y - 5);
+    ctx.lineTo(x, p.center.y + 5);
+
+    const y = p.center.y - p.ticks[i] * p.scale;
+    ctx.moveTo(p.center.x - 5, y);
+    ctx.lineTo(p.center.x + 5, y);
+  }
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "black";
+  ctx.font = "12px Arial";
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let i = 0; i < p.ticks.length; i++) {
+    const x = p.center.x + p.ticks[i] * p.scale;
+    if (Math.abs(p.ticks[i]) < 1e-6) continue;
+    ctx.fillText(p.labels[i], x, p.center.y + 8);
+  }
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i < p.ticks.length; i++) {
+    const y = p.center.y - p.ticks[i] * p.scale;
+    if (Math.abs(p.ticks[i]) < 1e-6) continue;
+    ctx.fillText(p.labels[i], p.center.x + 8, y);
+  }
+}
+
+function drawPoint(p, z, color) {
+  const pt = p.toCanvasCoords(z);
+  const ctx = p.ctx;
+  ctx.beginPath();
+  ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
 function expMap(z) {
-    const r = Math.exp(z.x);
-    return {
-    x: r * Math.cos(z.y),
-    y: r * Math.sin(z.y),
-    };
+  const r = Math.exp(z.x);
+  return { x: r * Math.cos(z.y), y: r * Math.sin(z.y) };
 }
 
 function logMap(w) {
-    const r = Math.sqrt(w.x * w.x + w.y * w.y);
-    const theta = Math.atan2(w.y, w.x);
-    return {
-    x: Math.log(r),
-    y: theta,
-    };
+  const r = Math.sqrt(w.x ** 2 + w.y ** 2);
+  const theta = Math.atan2(w.y, w.x);
+  return { x: Math.log(r), y: theta };
 }
 
 function redraw() {
-    // Recalculate center in case canvas size changed
-    center = { x: canvas1.width / 2, y: canvas1.height / 2 };
-    drawGrid(ctx2, intTicks, intLabels);
-    drawGrid(ctx1, piTicks, piLabels);
-
-    drawPoint(ctx1, z, "red");
-    drawPoint(ctx2, expMap(z), "blue");
+  Object.values(canvasParams).forEach(p => resizeCanvas(p));
+  drawGrid(canvasParams.canvas1);
+  if (canvasParams.canvas2.gridMode === 'polar') {
+        drawPolarGrid(canvasParams.canvas2);
+    } else {
+        drawGrid(canvasParams.canvas2);
+};
+  drawPoint(canvasParams.canvas1, z, "red");
+  drawPoint(canvasParams.canvas2, expMap(z), "blue");
 }
 
-function isInsidePoint(p, z) {
-    const zCanvas = toCanvasCoords(z);
-    const dx = p.x - zCanvas.x;
-    const dy = p.y - zCanvas.y;
-    return dx * dx + dy * dy <= radius * radius;
+function isInsidePoint(p, getZ, mouse) {
+  const pt = p.toCanvasCoords(getZ());
+  const dx = mouse.x - pt.x;
+  const dy = mouse.y - pt.y;
+  return dx * dx + dy * dy <= radius * radius;
 }
 
-let dragging = false;
-let dragSource = null;
+function setupDragging(p, getZ, setZ) {
+  const canvas = p.canvas;
+  let dragging = false;
 
-function setupDragging(canvas, getZ, setZ) {
-    canvas.addEventListener("mousedown", (e) => {
+  function getMouse(e) {
     const rect = canvas.getBoundingClientRect();
-    const mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    if (isInsidePoint(mouse, getZ())) {
-        dragging = true;
-        dragSource = { canvas, setZ };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  canvas.addEventListener("mousedown", e => {
+    const mouse = getMouse(e);
+    if (isInsidePoint(p, getZ, mouse)) {
+      dragging = true;
     }
-    });
+  });
 
-    canvas.addEventListener("mousemove", (e) => {
-    if (!dragging || dragSource.canvas !== canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    const value = fromCanvasCoords(mouse);
-    dragSource.setZ(value);
+  canvas.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    const mouse = getMouse(e);
+    const value = p.fromCanvasCoords(mouse);
+    setZ(value);
     redraw();
-    });
+  });
 
-    canvas.addEventListener("mouseup", () => dragging = false);
-    canvas.addEventListener("mouseleave", () => dragging = false);
+  canvas.addEventListener("mouseup", () => dragging = false);
+  canvas.addEventListener("mouseleave", () => dragging = false);
+
+  // Touch support
+  canvas.addEventListener("touchstart", e => {
+    const touch = e.touches[0];
+    const mouse = getMouse(touch);
+    if (isInsidePoint(p, getZ, mouse)) {
+      dragging = true;
+    }
+  });
+
+  canvas.addEventListener("touchmove", e => {
+    if (!dragging) return;
+    const touch = e.touches[0];
+    const mouse = getMouse(touch);
+    const value = p.fromCanvasCoords(mouse);
+    setZ(value);
+    redraw();
+  });
+
+  canvas.addEventListener("touchend", () => dragging = false);
 }
 
-setupDragging(canvas1,
-    () => z,
-    (value) => { z = value; });
-
-setupDragging(canvas2,
-    () => expMap(z),
-    (value) => { z = logMap(value); });
-
-window.addEventListener("resize", () => {
-    resizeCanvas(canvas1);
-    resizeCanvas(canvas2);
+setupDragging(canvasParams.canvas1, () => z, val => z = val);
+setupDragging(canvasParams.canvas2, () => expMap(z), val => z = logMap(val));
+window.addEventListener("resize", redraw);
+document.querySelectorAll('input[name="gridMode"]').forEach(radio => {
+  radio.addEventListener("change", (e) => {
+    canvasParams.canvas2.gridMode = e.target.value;
     redraw();
+  });
 });
 
 redraw();
