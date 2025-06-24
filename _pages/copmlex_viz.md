@@ -4,16 +4,21 @@ title: Visualization of complex functions
 permalink: /complex
 description: 
 ---
+
 ## Multivalued-ness of the the Logarithm
 The complex logarithm separates the absolute value and the phase of a complex number, 
+
 $$
 \log z = \log\left(R e^{i\phi}\right)=\log R+i\phi
 $$
+
 The logarithm is the inverse of the exponent, as can be seen from Euler's formula for example,
+
 $$
 \exp\big(\log z\big) = \exp^{\log R + i \phi}=R e^{i\phi}=z
 $$
-However, the exponent function is not one-to-one, $\exp(z)=\exp(z+2\pi i k)$ for any integer $k$. So its inverse is multivalued. That is, there are many possible choices for the angle $\phi$. To fix this, $\phi$ is conventionally defined to be between $-\pi$ and $\pi$, or $0$ and \\(2 pi\\). 
+
+However, the exponent function is not one-to-one, \\( \exp(z)=\exp(z+2\pi i k) \\) for any integer \\(k\\). So its inverse is multivalued. That is, there are many possible choices for the angle \\(k\\). To fix this, \\(k\\) is conventionally defined to be between \\(-\pi\\) and \\(\pi\\), or 0 and \\(2\pi\\)
 
 This is an arbitrary choice, and it would create a line of discontinuity, called a *branch cut*. A good way to visualize this  is to track a single point and its image under the mapping. Try to drag the blue or red points here:
 
