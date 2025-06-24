@@ -54,6 +54,8 @@
   }
 }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
 <div class="container my-5"  id="container-that-must-not-be-narrow">
   <div class="d-flex justify-content-between align-items-center flex-nowrap overflow-auto">
@@ -61,8 +63,8 @@
     <!-- Left Canvas -->
     <div class="canvas-wrapper">
       <div class="radio-buttons">
-        <label style="white-space: nowrap;"><input type="radio" name="logMode" value="branchcut" checked> log has a branch-cut</label>
-        <label style="white-space: nowrap;"><input type="radio" name="logMode" value="multivalued"> log is multivalued</label>
+        <label><input type="radio" name="logMode" value="branchcut" checked> log has a branch-cut</label>
+        <label><input type="radio" name="logMode" value="multivalued"> log is multivalued</label>
       </div>
       <canvas id="canvas1"></canvas>
     </div>
@@ -105,5 +107,12 @@
   </svg>
 </div>
 <div id="narrow-warning" style="display: none; background: #eee; color: #555; text-align: center; padding: 2em; border-radius: 8px;">
-  Please view this on a wider screen (e.g., hold your phone sideways).
+  <div style="font-size: 2em; margin-bottom: 0.5em;">
+    <i class="bi bi-phone"></i>
+    <i class="bi bi-arrow-right mx-2"></i>
+    <i class="bi bi-phone-landscape"></i>
+  </div>
+  Please view this on a wider screen <br>
+  <small>(e.g., hold your phone sideways)</small>
 </div>
+

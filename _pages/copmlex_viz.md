@@ -4,28 +4,33 @@ title: Visualization of complex functions
 permalink: /complex
 description: 
 ---
-## Logarithm
+## Multivalued-ness of the the Logarithm
 The complex logarithm separates the absolute value and the phase of a complex number, 
-\\[\log z = \log\left(R e^{i\phi}\right)=\log R+i\phi\\]
-The angle \\(\phi\\) is conventionally defined to be between \\(-\pi\\) and \\(\pi\\). This is an arbitrary choice of a branch cut. Here you can see 
-the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
-<img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
-The choice \\(-\pi<\phi<\pi\\) corresponds to the yellow sheet.
+$$
+\log z = \log\left(R e^{i\phi}\right)=\log R+i\phi
+$$
+The logarithm is the inverse of the exponent, as can be seen from Euler's formula for example,
+$$
+\exp\big(\log z\big) = \exp^{\log R + i \phi}=R e^{i\phi}=z
+$$
+However, the exponent function is not one-to-one, $\exp(z)=\exp(z+2\pi i k)$ for any integer $k$. So its inverse is multivalued. That is, there are many possible choices for the angle $\phi$. To fix this, $\phi$ is conventionally defined to be between $-\pi$ and $\pi$, or $0$ and \\(2 pi\\). 
 
-A nice way to visualize this is tracking a single point under the exp/log mapping. Drag either of the points below (if you're on a phone, better to hold it horizontally (landscape)):
+This is an arbitrary choice, and it would create a line of discontinuity, called a *branch cut*. A good way to visualize this  is to track a single point and its image under the mapping. Try to drag the blue or red points here:
 
 {% include two_paenls_log_exp.html %}
 
 Things to try/notice:
 
-1. Note that when dragging the red point, the blue point always moves continuously.
-1. However, when dragging the blue point in branch cut mode, the red point jumps discontinuously when crossing the branch cut (which here is chosen to be the negative real axis).
+1. Note that when dragging the red point, the blue point always moves continuously. However, when dragging the blue point in branch cut mode, the red point jumps discontinuously when crossing the branch cut (which here is chosen to be the negative real axis, or in other words $-\pi\le0<\pi$).
 1. Drag the blue point in a small path that does not encircle the origin.
-1. Drag the blue point in a small path that encircles the origin. Try both clockwise and anti-clockwise.
-1. Try to drag the red dot such that the blue dot follows a vertical/horizontal line.
-1. Do these in both branch-cut/multivalued modes.
+1. Drag the blue point in a small path that encircles the origin. Try both clockwise and anti-clockwise, in the branch-cut or multi-valued modes.
+1. Try to drag the red dot such that the blue dot follows a vertical/horizontal line. Did you see that the mapping $z\to \log z$ is very similar to a coordinate transform from cartesian to polar coordinates?
 
-It's also insightful to see how the log function warps the complex plane. In this widget, every point \\(z\\) moves on a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
+Another way of thinking about a multivalued function is a Riemann surface, which informally is the "stiching together" of the multiple values ("branches") of the inversion problem. Here you can see the real and imaginary part of the logarithm Riemann surface. That is, we plot \\(\mbox{Re}(\log(x+iy))\\) and \\(\mbox{Im}(\log(x+iy))\\) as functions of \\(x,y\\). 
+<img src="/assets/img/log_branch_cut.png" alt="Logarithm Branch Cut" style="width:100%; margin-top:20px">
+The choice \\(-\pi<\phi<\pi\\) corresponds to the yellow sheet.
+
+Another insightful visualization is the deformation of the gridlines under the log function. In this widget, every point \\(z\\) moves on a straight line from its "original" position at \\(t=0\\) to \\(\exp(z)\\) at \\(t=1\\):
 
 <div class="d-flex justify-content-center mb-3">
     <div class="slider-container text-center">
@@ -36,7 +41,7 @@ It's also insightful to see how the log function warps the complex plane. In thi
 </div>   
 <svg id="expchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
-Note that when you go from \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane.
+Note that when you go from \\(t=1\\) to \\(t=0\\), you're looking at how the logarithm (which is the inverse of the exponent) warps the complex plane. That is, how it takes a polar grid and returns a cartesian one.
 
 ## Powers and roots
 
