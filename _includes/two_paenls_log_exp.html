@@ -34,6 +34,19 @@
     z-index: 1; /* allow overflow visibility */
   }
 
+  .radio-buttons-bottom label {
+    font-size: 0.85em;
+    margin-left: 20px;
+  }
+   .btn-group-toggle .btn {
+    font-size: 0.7em;
+    padding: 0.35em 0.75em;
+  }
+  .btn.disabled,
+    .btn:disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
   @media (max-width: 600px) {
     #container-that-must-not-be-narrow {
       display: none !important;
@@ -43,33 +56,68 @@
     }
   }
 </style>
+
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<svg style="height: 0; width: 0;">
+  <defs>
+    <marker id="arrowhead"
+            markerWidth="10" markerHeight="7"
+            refX="10" refY="3.5"
+            orient="auto"
+            markerUnits="strokeWidth">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+</svg>
 
 <div class="container my-5" id="container-that-must-not-be-narrow">
-  <div class="d-flex justify-content-between align-items-start mb-3 flex-nowrap overflow-auto">
 
+  <!-- Controls Row -->
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-nowrap overflow-auto">
+    
     <!-- Left Controls -->
-    <div class="d-flex flex-column align-items-center" style="width: 46%; min-width: 250px;">
-      <div class="radio-buttons-top">
-        <label><input type="radio" name="logMode" value="branchcut"> log has a branch-cut</label>
-        <label><input type="radio" name="logMode" value="multivalued" checked> log is multivalued</label>
+    <div class="text-center" style="width: 46%; min-width: 250px;">
+      <!-- Log Mode Toggle Buttons -->
+      <div class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
+        <label class="btn btn-outline-primary btn-sm active">
+          <input type="radio" name="logMode" value="multivalued" autocomplete="off"> log is multivalued
+        </label>
+        <label class="btn btn-outline-primary btn-sm">
+          <input type="radio" name="logMode" value="branchcut" autocomplete="off" checked> log has a branch-cut
+        </label>
+      </div>
+
+      <!-- Theta Range Toggle Buttons -->
+      <div id="theta-group" class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
+        <label class="btn btn-outline-success btn-sm active">
+          <input type="radio" name="thetaRange" value="mpi_pi" autocomplete="off" checked> −π &lt; θ &lt; π
+        </label>
+        <label class="btn btn-outline-success btn-sm">
+          <input type="radio" name="thetaRange" value="zero_2pi" autocomplete="off"> 0 &lt; θ &lt; 2π
+        </label>
+        <label class="btn btn-outline-success btn-sm">
+          <input type="radio" name="thetaRange" value="mpi1_pi1" autocomplete="off"> −π+1 &lt; θ &lt; π+1
+        </label>
       </div>
     </div>
-
-    <!-- Spacer for arrows -->
-    <div class="arrow-block" style="width: 100px;"></div>
 
     <!-- Right Controls -->
-    <div class="d-flex flex-column align-items-center" style="width: 46%; min-width: 250px;">
-      <div class="radio-buttons-top">
-        <label><input type="radio" name="gridMode" value="cartesian" checked> Cartesian</label>
-        <label><input type="radio" name="gridMode" value="polar"> Polar</label>
+    <div class="text-center" style="width: 46%; min-width: 250px;">
+      <!-- Grid Mode Toggle Buttons -->
+      <div  class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
+        <label class="btn btn-outline-primary btn-sm active">
+          <input type="radio" name="gridMode" value="cartesian" autocomplete="off" checked> Cartesian
+        </label>
+        <label class="btn btn-outline-primary btn-sm">
+          <input type="radio" name="gridMode" value="polar" autocomplete="off"> Polar
+        </label>
       </div>
     </div>
-  </div>
 
+  </div>
   <!-- Canvases + Arrows -->
-  <div class="d-flex justify-content-between align-items-center flex-nowrap overflow-auto">
+  <div class="d-flex justify-content-between align-items-center flex-nowrap overflow-auto"> 
     <!-- Left Canvas -->
     <div class="canvas-wrapper">
       <canvas id="canvas1"></canvas>
@@ -93,6 +141,7 @@
     </div>
   </div>
 </div>
+
 
 <div id="narrow-warning" style="display: none; background: #eee; color: #555; text-align: center; padding: 2em; border-radius: 8px;">
   <div style="font-size: 2em; margin-bottom: 0.5em;">

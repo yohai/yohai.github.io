@@ -1,6 +1,10 @@
 const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
-
+const branchAngles ={
+    mpi_pi: -Math.PI,
+    mpi1_pi1: -Math.PI + 1,
+    zero_2pi: 0
+  }
 const radius = 8.5;
 
 // Parameters per canvas
@@ -13,7 +17,6 @@ const canvasParams = {
     center: { x: 0, y: 0 },
     toCanvasCoords: null,
     fromCanvasCoords: null,
-    logMode: 'branchcut',
     logicalWidth: 4.2 * Math.PI,
   },
   canvas2: {
@@ -24,9 +27,10 @@ const canvasParams = {
     center: { x: 0, y: 0 },
     toCanvasCoords: null,
     fromCanvasCoords: null,
-    gridMode: 'cartesian',
-    logicalWidth: 33,
-  }
+    logicalWidth: 33},
+  gridMode: 'cartesian',
+  logMode: 'branchcut',
+  thetaRange: 'mpi_pi',
 };
 
 // Shared state
@@ -62,6 +66,37 @@ function drawPoint(p, z, color) {
   ctx.fill();
 }
 
+function drawBranchCut(){
+  const ctx2 = canvasParams.canvas2.ctx;
+  ctx2.strokeStyle = "#008F00";
+  ctx2.lineWidth = 6;
+  ctx2.setLineDash([15, 3]);
+  ctx2.beginPath();
+
+  const origin = canvasParams.canvas2.toCanvasCoords({ x: 0, y: 0 });
+  const angle = branchAngles[canvasParams.thetaRange];
+  const pt = canvasParams.canvas2.toCanvasCoords({
+    x: Math.cos(angle) * canvasParams.canvas2.logicalWidth * 2,
+    y: Math.sin(angle) * canvasParams.canvas2.logicalWidth * 2,
+  })
+  ctx2.moveTo(origin.x, origin.y);
+  ctx2.lineTo(pt.x, pt.y);
+  ctx2.stroke();
+
+  const W = canvasParams.canvas2.logicalWidth;
+  const ctx1 = canvasParams.canvas1.ctx;
+  ctx1.fillStyle = "#008F0022";
+  ctx1.strokeStyle = "#008F00";
+  ctx1.setLineDash([12, 3]); 
+  ctx1.lineWidth = 1; 
+  const tcc = canvasParams.canvas1.toCanvasCoords
+
+  const bottom_left = tcc({x: -W/2, y: angle})
+  const top_right = tcc({x: W/2, y: angle+2*Math.PI});
+  ctx1.fillRect(bottom_left.x, bottom_left.y, top_right.x-bottom_left.x, top_right.y-bottom_left.y)
+  ctx1.strokeRect(bottom_left.x, bottom_left.y, top_right.x-bottom_left.x, top_right.y-bottom_left.y)
+}
+
 function expMap(z) {
   const r = Math.exp(z.x);
   return { x: r * Math.cos(z.y), y: r * Math.sin(z.y) };
@@ -74,24 +109,43 @@ function liftAngle(theta, reference) {
 
 function logMap(w) {
   const r = Math.sqrt(w.x ** 2 + w.y ** 2);
-  const theta = Math.atan2(w.y, w.x);
+  let theta = Math.atan2(w.y, w.x);
+  switch (canvasParams.thetaRange) {
+    case 'mpi_pi':
+      break;
+    case 'mpi1_pi1':
+        if (theta < -Math.PI + 1) {
+            theta += 2 * Math.PI;
+        }
+        break;
+    case 'zero_2pi':
+      if (theta < 0) { 
+        theta += 2 * Math.PI;
+        }
+        break;
+    }
 
-  if (canvasParams.canvas1.logMode === 'branchcut') {
+  if (canvasParams.logMode === 'branchcut') {
     return { x: Math.log(r), y: theta };
-  } else if (canvasParams.canvas1.logMode === 'multivalued') {
+  } else if (canvasParams.logMode === 'multivalued') {
     const currentTheta = z.y;
     const lifted = liftAngle(theta, currentTheta);
     return { x: Math.log(r), y: lifted };
   }
 }
 function redraw() {
-  Object.values(canvasParams).forEach(p => resizeCanvas(p));
+  resizeCanvas(canvasParams.canvas1);
+  resizeCanvas(canvasParams.canvas2);
   drawGrid(canvasParams.canvas1);
-  if (canvasParams.canvas2.gridMode === 'polar') {
+  if (canvasParams.gridMode === 'polar') {
         drawPolarGrid(canvasParams.canvas2);
     } else {
         drawGrid(canvasParams.canvas2);
-};
+    }
+  if (canvasParams.logMode === 'branchcut') {
+    drawBranchCut();
+  }
+  
   drawPoint(canvasParams.canvas1, z, "red");
   drawPoint(canvasParams.canvas2, expMap(z), "blue");
 }
@@ -168,9 +222,36 @@ document.querySelectorAll('input[name="gridMode"]').forEach(radio => {
     redraw();
   });
 });
+
+const thetaGroup = document.getElementById('theta-group');
+const thetaInputs = thetaGroup.querySelectorAll('input');
+const thetaLabels = thetaGroup.querySelectorAll('label');
+
+document.querySelectorAll('input[name="thetaRange"]').forEach(radio => {
+  radio.addEventListener("change", (e) => {
+    canvasParams.thetaRange = e.target.value;
+    redraw();
+  });
+});
+
 document.querySelectorAll('input[name="logMode"]').forEach(radio => {
   radio.addEventListener("change", (e) => {
-    canvasParams.canvas1.logMode = e.target.value;
+    canvasParams.logMode = e.target.value;
+
+    if (canvasParams.logMode === 'multivalued') {
+      thetaInputs.forEach(input => input.disabled = true);
+      thetaLabels.forEach(label => {
+        label.classList.remove('btn-outline-success');
+        label.classList.add('btn-outline-secondary', 'disabled');
+      });
+    } else {
+      thetaInputs.forEach(input => input.disabled = false);
+      thetaLabels.forEach(label => {
+        label.classList.remove('btn-outline-secondary', 'disabled');
+        label.classList.add('btn-outline-success');
+      });
+    }
+    redraw();
   });
 });
 redraw();
@@ -301,10 +382,3 @@ function drawTicks(p, ctx) {
     ctx.fillText(p.labels[i], p.center.x + 8, y);
   }
 }
-
-
-document.querySelectorAll('.radio-buttons label').forEach(label => {
-  label.addEventListener('mousedown', e => e.stopPropagation(), true);
-  label.addEventListener('mouseup', e => e.stopPropagation(), true);
-  label.addEventListener('mousemove', e => e.stopPropagation(), true);
-});
