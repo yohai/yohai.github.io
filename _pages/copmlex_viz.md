@@ -26,7 +26,7 @@ This is an arbitrary choice, and it would create a line of discontinuity, called
 
 Things to try/notice:
 
-1. Note that when dragging the red point, the blue point always moves continuously. However, when dragging the blue point in branch cut mode, the red point jumps discontinuously when crossing the branch cut (which here is chosen to be the negative real axis, or in other words $-\pi\le0<\pi$).
+1. Note that when dragging the red point, the blue point always moves continuously. However, when dragging the blue point in branch cut mode, the red point jumps discontinuously when crossing the branch cut (which here is chosen to be the negative real axis, or in other words \\( -\pi\le \phi<\pi \\) ).
 1. Drag the blue point in a small path that does not encircle the origin.
 1. Drag the blue point in a small path that encircles the origin. Try both clockwise and anti-clockwise, in the branch-cut or multi-valued modes.
 1. Try to drag the red dot such that the blue dot follows a vertical/horizontal line. Did you see that the mapping $z\to \log z$ is very similar to a coordinate transform from cartesian to polar coordinates?
@@ -74,7 +74,7 @@ In this case, the complex plane maps onto itself exactly α times.
 
 <svg id="powerchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
-Another way to look at it: raising to the power \\(α\\) is equivalent to
+Another way to look at it: raising to the power \\(\alpha \\) is equivalent to
 \\( z^\alpha = e^{\alpha \log z}\\). 
 What you're seeing when looking at fractional powers is the same branch cut of the imaginary part of the logarithm.
 When \\(alpha\\) is an integer, the branch cut exactly closes off. 
