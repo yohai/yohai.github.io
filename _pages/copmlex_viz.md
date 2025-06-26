@@ -40,7 +40,7 @@ Another insightful visualization is the deformation of the gridlines under the l
 <div class="d-flex justify-content-center mb-3">
     <div class="slider-container text-center">
         <label for="t" class="form-label">t= <span id="tValue">0.0</span></label>
-        <input type="range" class="form-range" id="t" min="0" max="1" step="0.05" value="0">
+        <input type="range" class="form-range" id="t" min="0" max="1" step="0.025" value="0">
         <span style="font-size:12px">⬅️  slide me!</span>
     </div>
 </div>   
