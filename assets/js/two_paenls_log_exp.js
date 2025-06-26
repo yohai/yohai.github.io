@@ -214,7 +214,7 @@ setupDragging(canvasParams.canvas2, () => expMap(z), val => z = logMap(val));
 window.addEventListener("resize", redraw);
 document.querySelectorAll('input[name="gridMode"]').forEach(radio => {
   radio.addEventListener("change", (e) => {
-    canvasParams.canvas2.gridMode = e.target.value;
+    canvasParams.gridMode = e.target.value;
     redraw();
   });
 });
