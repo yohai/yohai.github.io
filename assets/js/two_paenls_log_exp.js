@@ -168,9 +168,7 @@ function setupDragging(p, getZ, setZ) {
 
   canvas.addEventListener("mousedown", e => {
     const mouse = getMouse(e);
-    if (isPointInCanvas(p, getZ, mouse)) {
-      dragging = true;
-    }
+    dragging = true;
   });
 
   canvas.addEventListener("mousemove", e => {
@@ -194,11 +192,8 @@ function setupDragging(p, getZ, setZ) {
 
   // Touch support
   canvas.addEventListener("touchstart", e => {
-    const touch = e.touches[0];
-    const mouse = getMouse(touch);
-    if (isPointInCanvas(p, getZ, mouse)) {
-      dragging = true;
-    }
+  e.preventDefault();  // important: prevent scrolling
+  dragging = true;
   });
 
   canvas.addEventListener("touchmove", e => {
@@ -209,8 +204,9 @@ function setupDragging(p, getZ, setZ) {
     setZ(value);
     redraw();
   });
-
+  
   canvas.addEventListener("touchend", () => dragging = false);
+  canvas.addEventListener("touchcancel", () => dragging = false);
 }
 
 setupDragging(canvasParams.canvas1, () => z, val => z = val);

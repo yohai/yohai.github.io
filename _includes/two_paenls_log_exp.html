@@ -1,18 +1,35 @@
 <style>
   .canvas-wrapper {
-    width: 46%;
-    min-width: 250px;
-    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 100%;
     position: relative;
+    margin: 0 auto;
   }
 
+  table {
+    border-collapse: collapse;
+    border: none;
+    border: none !important;
+    outline: none;
+    border-collapse: collapse;
+  }
+
+  td {
+    border: none !important;
+    padding:0;
+  }
+
+  table tr:hover,
+  table td:hover {
+    background-color: transparent !important;
+  }
   canvas {
     width: 100%;
-    height: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
     display: block;
     border: 1px solid #ccc;
     border-radius: 8px;
-    touch-action: none;
   }
 
   .radio-buttons-top {
@@ -32,6 +49,15 @@
     width: 100px;
     flex-shrink: 0;
     z-index: 1; /* allow overflow visibility */
+  }
+
+  .control-wrapper {
+    width: 46%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .radio-buttons-bottom label {
@@ -71,75 +97,81 @@
   </defs>
 </svg>
 
-<div class="container my-5" id="container-that-must-not-be-narrow">
+<div id="container-that-must-not-be-narrow">
+  <table style="width: 100%; table-layout: fixed;">
+    <tr>
+      <!-- Left Controls -->
+      <td style="width: 46%; min-width: 250px; text-align: center; vertical-align: top; padding:0">
+        <!-- Log Mode Buttons -->
+        <div class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
+          <label class="btn btn-outline-primary btn-sm active">
+            <input type="radio" name="logMode" value="multivalued" autocomplete="off"> log is multivalued
+          </label>
+          <label class="btn btn-outline-primary btn-sm">
+            <input type="radio" name="logMode" value="branchcut" autocomplete="off" checked> log has a branch-cut
+          </label>
+        </div>
 
-  <!-- Controls Row -->
-  <div class="d-flex justify-content-between align-items-start mb-3 flex-nowrap overflow-auto">
-    
-    <!-- Left Controls -->
-    <div class="text-center" style="width: 46%; min-width: 250px;">
-      <!-- Log Mode Toggle Buttons -->
-      <div class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
-        <label class="btn btn-outline-primary btn-sm active">
-          <input type="radio" name="logMode" value="multivalued" autocomplete="off"> log is multivalued
-        </label>
-        <label class="btn btn-outline-primary btn-sm">
-          <input type="radio" name="logMode" value="branchcut" autocomplete="off" checked> log has a branch-cut
-        </label>
-      </div>
+        <!-- Theta Range Buttons -->
+        <div id="theta-group" class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
+          <label class="btn btn-outline-success btn-sm active">
+            <input type="radio" name="thetaRange" value="mpi_pi" autocomplete="off" checked> −π &lt; θ &lt; π
+          </label>
+          <label class="btn btn-outline-success btn-sm">
+            <input type="radio" name="thetaRange" value="zero_2pi" autocomplete="off"> 0 &lt; θ &lt; 2π
+          </label>
+          <label class="btn btn-outline-success btn-sm">
+            <input type="radio" name="thetaRange" value="mpi1_pi1" autocomplete="off"> −π+1 &lt; θ &lt; π+1
+          </label>
+        </div>
+      </td>
 
-      <!-- Theta Range Toggle Buttons -->
-      <div id="theta-group" class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
-        <label class="btn btn-outline-success btn-sm active">
-          <input type="radio" name="thetaRange" value="mpi_pi" autocomplete="off" checked> −π &lt; θ &lt; π
-        </label>
-        <label class="btn btn-outline-success btn-sm">
-          <input type="radio" name="thetaRange" value="zero_2pi" autocomplete="off"> 0 &lt; θ &lt; 2π
-        </label>
-        <label class="btn btn-outline-success btn-sm">
-          <input type="radio" name="thetaRange" value="mpi1_pi1" autocomplete="off"> −π+1 &lt; θ &lt; π+1
-        </label>
-      </div>
-    </div>
+      <!-- Phantom Arrow Spacer -->
+      <td style="width: 100px; vertical-align: top;"></td>
 
-    <!-- Right Controls -->
-    <div class="text-center" style="width: 46%; min-width: 250px;">
-      <!-- Grid Mode Toggle Buttons -->
-      <div  class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
-        <label class="btn btn-outline-primary btn-sm active">
-          <input type="radio" name="gridMode" value="cartesian" autocomplete="off" checked> Cartesian
-        </label>
-        <label class="btn btn-outline-primary btn-sm">
-          <input type="radio" name="gridMode" value="polar" autocomplete="off"> Polar
-        </label>
-      </div>
-    </div>
+      <!-- Right Controls -->
+      <td style="width: 46%; min-width: 250px; text-align: center; vertical-align: top;">
+        <!-- Grid Mode Buttons -->
+        <div class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
+          <label class="btn btn-outline-primary btn-sm active">
+            <input type="radio" name="gridMode" value="cartesian" autocomplete="off" checked> Cartesian
+          </label>
+          <label class="btn btn-outline-primary btn-sm">
+            <input type="radio" name="gridMode" value="polar" autocomplete="off"> Polar
+          </label>
+        </div>
+      </td>
+    </tr>
 
-  </div>
-  <!-- Canvases + Arrows -->
-  <div class="d-flex justify-content-between align-items-center flex-nowrap overflow-auto"> 
-    <!-- Left Canvas -->
-    <div class="canvas-wrapper">
-      <canvas id="canvas1"></canvas>
-    </div>
+    <tr>
+      <!-- Left Canvas -->
+      <td>
+        <div class="canvas-wrapper">
+          <canvas id="canvas1"></canvas>
+        </div>
+      </td>
 
-    <!-- Arrow Block -->
-    <div class="arrow-block d-flex flex-column justify-content-center align-items-center mx-2 text-center">
-      <div class="mb-1">Exp</div>
-      <svg width="65" height="10">
-        <line x1="0" y1="5" x2="65" y2="5" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
-      </svg>
-      <svg width="65" height="10" class="mt-2">
-        <line x1="65" y1="5" x2="0" y2="5" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
-      </svg>
-      <div class="mt-1">Log</div>
-    </div>
+      <!-- Arrow Block -->
+      <td class="arrow-block text-center align-middle">
+        <div class="mb-1">Exp</div>
+        <svg width="65" height="10">
+          <line x1="0" y1="5" x2="65" y2="5" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+        </svg>
+        <svg width="65" height="10" class="mt-2">
+          <line x1="65" y1="5" x2="0" y2="5" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+        </svg>
+        <div class="mt-1">Log</div>
+      </td>
 
-    <!-- Right Canvas -->
-    <div class="canvas-wrapper">
-      <canvas id="canvas2"></canvas>
-    </div>
-  </div>
+      <!-- Right Canvas -->
+      <td>
+        <div class="canvas-wrapper">
+          <canvas id="canvas2"></canvas>
+        </div>
+      </td>
+    </tr>
+  </table>
+
 </div>
 
 
