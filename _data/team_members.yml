@@ -35,9 +35,15 @@
 - name: Ran Yaacoby
   photo: Ran.jpg
   title: PhD student
-  # email: shachafrotem@mail.tau.ac.il
   info: >
    Ran is studying the dynamics of deep neural networks.
+
+- name: Noa Eliasi
+  photo: Noa.jpg
+  title: MSc student
+  info: >
+   Noa is studying elasticity of 2D materials, in the context of [slidetronics](https://physicsworld.com/a/slidetronics-makes-its-debut/). 
+   She is co-advised by [Prof. Moshe Ben-Shalom](https://www.qlmgtau.com/).
 
 
 # - name: "This could be you !"
