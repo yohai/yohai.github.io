@@ -22,7 +22,7 @@ However, the exponent function is not one-to-one, \\( \exp(z)=\exp(z+2\pi i k) \
 
 This is an arbitrary choice, and it would create a line of discontinuity, called a *branch cut*. A good way to visualize this  is to track a single point and its image under the mapping. Try to drag the blue or red points here:
 
-{% include two_paenls_log_exp.html %}
+{% include two_panels_log_exp.html %}
 
 Things to try/notice:
 
@@ -84,3 +84,11 @@ When \\(\alpha\\) is an integer, the branch cut exactly closes off.
 <script type='module' src="{{ '/assets/js/power_plot.js' | relative_url }}"></script>
 <script type='module' src="{{ '/assets/js/exp_interpolation_plot.js' | relative_url }}"></script>
 <script type='module' src="{{ '/assets/js/two_paenls_log_exp.js' | relative_url }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const mode_toggle = document.getElementById("light-toggle");
+    if (mode_toggle) {
+       mode_toggle.remove();
+    }
+    setTheme("light")
+</script>
