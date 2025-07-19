@@ -84,11 +84,3 @@ When \\(\alpha\\) is an integer, the branch cut exactly closes off.
 <script type='module' src="{{ '/assets/js/power_plot.js' | relative_url }}"></script>
 <script type='module' src="{{ '/assets/js/exp_interpolation_plot.js' | relative_url }}"></script>
 <script type='module' src="{{ '/assets/js/two_paenls_log_exp.js' | relative_url }}"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const mode_toggle = document.getElementById("light-toggle");
-    if (mode_toggle) {
-       mode_toggle.remove();
-    }
-    setTheme("light")
-</script>

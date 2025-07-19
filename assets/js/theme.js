@@ -128,22 +128,7 @@ let transTheme = () => {
 };
 
 let initTheme = (theme) => {
-  if (theme == null || theme == "null") {
-    const userPref = window.matchMedia;
-    if (userPref && userPref("(prefers-color-scheme: dark)").matches) {
-      theme = "dark";
-    }
-  }
-
-  setTheme(theme);
+  setTheme('light');
 };
 
 initTheme(localStorage.getItem("theme"));
-
-document.addEventListener("DOMContentLoaded", function () {
-  const mode_toggle = document.getElementById("light-toggle");
-  setTheme("light");
-  if (mode_toggle) {
-       mode_toggle.remove();
-    }
-});
