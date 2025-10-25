@@ -50,9 +50,14 @@ Note that when you go from \\(t=1\\) to \\(t=0\\), you're looking at how the log
 
 ## Powers and roots
 
-Here you can see how the complex plane maps to itself under \\( f(z)=z^{\alpha} \\), for various \\(α\\)s and choices of the branch cut.
-Note how the result is independent of the choice of branch cut when α is an integer. 
-In this case, the complex plane maps onto itself exactly α times.
+A similar thing happens for powers and roots. Let's look for example at the function \\( z\to z^2 \\) and its inverse, \\( z\to\sqrt z \\). 
+In polar representation, \\( z=Re^{i\theta} \\), the square function squares the radius and doubles the angle. 
+Try to drag the red dot in a circle around the origin, and see what happens to the blue dot:
+
+{% include complex_viz/two_panels_sqrt.html %}
+
+Here again you see that the map \\( z\to z^2 \\) is nice and smooth and has no discontinuities, but its inverse map \\( z\to\sqrt z \\) 
+is either multivalued or has a branch cut. this is because \\( z\to z^2 \\) wraps the plane around itself twice:
 
 <div class="d-flex justify-content-between mb-3">
     <div class="slider-container me-3 d-flex flex-column align-items-center text-start">
@@ -70,16 +75,14 @@ In this case, the complex plane maps onto itself exactly α times.
         <button id="resetBranchcut" class="btn btn-primary btn-sm mt-1 px-2 py-0">Reset</button>
     </div>
 </div>
-
-
 <svg id="powerchart" class="border" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" style="margin-bottom:20px"></svg>
 
-Another way to look at it: raising to the power \\( \alpha \\) is equivalent to
+Note how the result is independent of the choice of branch cut when α is an integer. 
+In this case, the complex plane maps onto itself exactly α times. When \\(\alpha\\) is an integer, the branch cut exactly closes off. 
+Actually, raising to the power \\( \alpha \\) is defined by
 \\( z^\alpha = e^{\alpha \log z}\\). 
-What you're seeing when looking at fractional powers is the same branch cut of the imaginary part of the logarithm.
-When \\(\alpha\\) is an integer, the branch cut exactly closes off. 
+So the branch cut in the sqrt function, or any other fractional power, is the same branch cut of the imaginary part of the logarithm.
 
-{% include complex_viz/two_panels_sqrt.html %}
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script type='module' src="{{ '/assets/js/complex_viz/power_plot.js' | relative_url }}"></script>

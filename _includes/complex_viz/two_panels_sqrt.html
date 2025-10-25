@@ -105,24 +105,24 @@
         <!-- Log Mode Buttons -->
         <div class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
           <label class="btn btn-outline-primary btn-sm active">
-            <input type="radio" name="sqrtMode" value="multivalued" autocomplete="off"> sqrt is multivalued
+            <input type="radio" name="sqrtMode" value="multivalued" autocomplete="off" checked> sqrt is multivalued
           </label>
           <label class="btn btn-outline-primary btn-sm">
-            <input type="radio" name="sqrtMode" value="branchcut" autocomplete="off" checked> sqrt has a branch-cut
+            <input type="radio" name="sqrtMode" value="branchcut" autocomplete="off"> sqrt has a branch-cut
           </label>
         </div>
         
         
         <!-- Theta Range Buttons -->
-        <div id="theta-group" class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
-          <label class="btn btn-outline-success btn-sm active">
-            <input type="radio" name="thetaRange" value="mpi_pi" autocomplete="off" checked> −π &lt; θ &lt; π
+        <div id="theta-group-sqrt" class="btn-group btn-group-toggle mb-2" data-toggle="buttons">
+          <label class="btn btn-outline-success btn-sm active disabled">
+            <input type="radio" name="thetaRangeSqrt" value="mpi_pi" autocomplete="off" checked> −π &lt; θ &lt; π
           </label>
-          <label class="btn btn-outline-success btn-sm">
-            <input type="radio" name="thetaRange" value="zero_2pi" autocomplete="off"> 0 &lt; θ &lt; 2π
+          <label class="btn btn-outline-success btn-sm disabled">
+            <input type="radio" name="thetaRangeSqrt" value="zero_2pi" autocomplete="off"> 0 &lt; θ &lt; 2π
           </label>
-          <label class="btn btn-outline-success btn-sm">
-            <input type="radio" name="thetaRange" value="mpi1_pi1" autocomplete="off"> −π+1 &lt; θ &lt; π+1
+          <label class="btn btn-outline-success btn-sm disabled">
+            <input type="radio" name="thetaRangeSqrt" value="mpi1_pi1" autocomplete="off"> −π+1 &lt; θ &lt; π+1
           </label>
         </div>
       </td>

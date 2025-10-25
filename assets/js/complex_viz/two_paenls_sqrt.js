@@ -34,7 +34,7 @@ const canvasParams = {
     fromCanvasCoords: null,
     logicalWidth: 8.2  },
   gridMode: 'cartesian',
-  sqrtMode: 'branchcut',
+  sqrtMode: 'multivalued',
   thetaRange: 'mpi_pi',
 };
 
@@ -116,11 +116,6 @@ function squareMap(z) {
   return { x: z.x **2 - z.y ** 2, y: 2 * z.x * z.y };
 }
 
-function liftAngle(theta, reference) {
-  const TWO_PI = 2 * Math.PI;
-  return theta + TWO_PI * Math.round((reference - theta) / TWO_PI);
-}
-
 function sqrtMap(w) {
   const r = Math.sqrt(Math.sqrt(w.x ** 2 + w.y ** 2));
   let theta = Math.atan2(w.y, w.x);
@@ -138,13 +133,17 @@ function sqrtMap(w) {
         }
         break;
     }
-
+  const proposed_z = { x: r * Math.cos(theta / 2), y: r * Math.sin(theta / 2) }
   if (canvasParams.sqrtMode === 'branchcut') {
-    return { x: r * Math.cos(theta / 2), y: r * Math.sin(theta / 2) };
+    return proposed_z;
   } else if (canvasParams.sqrtMode === 'multivalued') {
-    const currentTheta = z.y;
-    const lifted = liftAngle(theta, currentTheta);
-    return { x: r * Math.cos(lifted / 2), y: r * Math.sin(lifted / 2) };
+    const d1 = Math.hypot(proposed_z.x - z.x, proposed_z.y - z.y);
+    const d2 = Math.hypot(-proposed_z.x - z.x, -proposed_z.y - z.y);
+    if (d1 < d2) {
+      return proposed_z;
+    } else {
+      return { x: -proposed_z.x, y: -proposed_z.y };
+    }
   }
 }
 
@@ -230,11 +229,11 @@ document.querySelectorAll('input[name="gridMode"]').forEach(radio => {
   });
 });
 
-const thetaGroup = document.getElementById('theta-group');
+const thetaGroup = document.getElementById('theta-group-sqrt');
 const thetaInputs = thetaGroup.querySelectorAll('input');
 const thetaLabels = thetaGroup.querySelectorAll('label');
 
-document.querySelectorAll('input[name="thetaRange"]').forEach(radio => {
+document.querySelectorAll('input[name="thetaRangeSqrt"]').forEach(radio => {
   radio.addEventListener("change", (e) => {
     canvasParams.thetaRange = e.target.value;
     redraw();
