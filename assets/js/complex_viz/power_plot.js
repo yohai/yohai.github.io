@@ -146,7 +146,7 @@ const restoreButton = d3.select("#restoreDefaults");
 function handleInput() {
     const alpha = +alphaInput.node().value;
     const branchAngle = +branchAngleInput.node().value;
-    alphaValue.text(alpha.toFixed(1));
+    alphaValue.text(alpha.toFixed(2));
     branchAngleValue.text(branchAngle);
     update(alpha, branchAngle);
 }

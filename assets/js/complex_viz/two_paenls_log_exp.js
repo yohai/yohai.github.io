@@ -157,7 +157,7 @@ function isPointInCanvas(p, getZ, mouse) {
   return dx * dx + dy * dy <= radius * radius;
 }
 
-function setupDragging(p, getZ, setZ) {
+function setupDragging(p, setZ) {
   const canvas = p.canvas;
   let dragging = false;
 
@@ -209,8 +209,8 @@ function setupDragging(p, getZ, setZ) {
   canvas.addEventListener("touchcancel", () => dragging = false);
 }
 
-setupDragging(canvasParams.canvas1, () => z, val => z = val);
-setupDragging(canvasParams.canvas2, () => expMap(z), val => z = logMap(val));
+setupDragging(canvasParams.canvas1, val => z = val);
+setupDragging(canvasParams.canvas2, val => z = logMap(val));
 window.addEventListener("resize", redraw);
 document.querySelectorAll('input[name="gridMode"]').forEach(radio => {
   radio.addEventListener("change", (e) => {

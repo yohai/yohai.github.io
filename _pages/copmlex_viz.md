@@ -22,7 +22,7 @@ However, the exponent function is not one-to-one, \\( \exp(z)=\exp(z+2\pi i k) \
 
 This is an arbitrary choice, and it would create a line of discontinuity, called a *branch cut*. A good way to visualize this  is to track a single point and its image under the mapping. Try to drag the blue or red points here:
 
-{% include two_panels_log_exp.html %}
+{% include complex_viz/two_panels_log_exp.html %}
 
 Things to try/notice:
 
@@ -79,8 +79,10 @@ Another way to look at it: raising to the power \\( \alpha \\) is equivalent to
 What you're seeing when looking at fractional powers is the same branch cut of the imaginary part of the logarithm.
 When \\(\alpha\\) is an integer, the branch cut exactly closes off. 
 
+{% include complex_viz/two_panels_sqrt.html %}
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script type='module' src="{{ '/assets/js/power_plot.js' | relative_url }}"></script>
-<script type='module' src="{{ '/assets/js/exp_interpolation_plot.js' | relative_url }}"></script>
-<script type='module' src="{{ '/assets/js/two_paenls_log_exp.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/complex_viz/power_plot.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/complex_viz/exp_interpolation_plot.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/complex_viz/two_paenls_log_exp.js' | relative_url }}"></script>
+<script type='module' src="{{ '/assets/js/complex_viz/two_paenls_sqrt.js' | relative_url }}"></script>
