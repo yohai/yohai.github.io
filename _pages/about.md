@@ -13,12 +13,11 @@ profile:
     <p> <a href="https://www.tau.ac.il"> Tel Aviv University </a> </p>
     <p> 30 Haim Levanon st., Ramat Aviv, Tel Aviv 69978  </p>
 
-news: true # includes a list of news items
+news: false # includes a list of news items
 latest_posts: false # includes a list of the newest posts
 selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-We study physics of complex systems using tools from statistical physics, non linear mechanics, machine learning and computational physics. We are a research group at the [School of physics](https://physics.tau.ac.il) in [Tel Aviv University](https://www.tau.ac.il).  The group is also a member of Tel-Aviv University's [BioSoft Center](https://www.biosoft.sites.tau.ac.il/) and [Data Science center](https://datascience.tau.ac.il/).
-
-
+We are a research group at the [Racah Institue of physics](https://phys.huji.ac.il) and the [School of Computer Science and Engineering](https://www.cs.huji.ac.il/) at The Hebrew University of Jerusalem.
+We study physics of complex systems using tools from statistical physics, non linear mechanics, machine learning and computational physics. 
