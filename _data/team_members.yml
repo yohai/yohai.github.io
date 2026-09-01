@@ -1,7 +1,7 @@
 - name: Yohai Bar-Sinai
   photo: Yohai.jpg
   title: Principal investigator
-  email: ybarsinai@gmail.com
+  email: yohai.barsinai@mail.huji.ac.il
   education: ["PhD, Weizmann Institute of science, 2016",
               "Master, UPMC, Paris, 2010",
               "BA, Physics+Math, Hebrew University, 2008"]
@@ -48,7 +48,7 @@
 
 # - name: "This could be you !"
 #   title: "Drop me a line if you want to join:"
-#   email: ybarsinai@gmail.com
+#   email: yohai.barsinai@mail.huji.ac.il
 #   photo: Graduation_hat.svg
 #   info: >
 #    Want to join? we're currently looking for Master students 
