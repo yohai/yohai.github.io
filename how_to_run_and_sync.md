@@ -1,16 +1,14 @@
 # Running locally
+
 ```bash
 bundle exec jekyll serve
 ```
 
-# Syncing from Upstream Repository
+Responsive images need ImageMagick (`brew install imagemagick`).
 
-To sync your forked repository with the original upstream repository, you can follow these steps:
+# Upstream (al-folio)
 
-1. fetch and merge:
-    ```bash
-    git fetch upstream 
-    git merge upstream/master
-    ```
-
-2. If there are any conflicts, resolve them manually.
+This site was forked from [al-folio](https://github.com/alshedivat/al-folio) at
+commit `a843b3c6` (January 2024) and is no longer synced with it. Upstream has
+since been restructured (v1.x) and merging it is not worth the conflicts. To
+take a specific fix from upstream, cherry-pick or copy it by hand.
