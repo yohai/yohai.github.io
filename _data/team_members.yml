@@ -18,32 +18,17 @@
 
 - name: Yamin Ben-Shimon
   photo: yamin.jpg
-  title: Master student
+  title: PhD student
   info: >
    Yamin is working on incorporating our [Neural-based method for calculating entropy](https://doi.org/10.1073/pnas.2017042117) 
    into molecular dynamics simulations. The aim is to use neurally-estimated entropy as a collective variable in MD simulations
    that would allow effective sampling of entropically stabilized phases. Yamin is co-advised by [Dr. Barak Hirshberg](https://hirshberg-group.webflow.io/) from the school of Chemistry.
-
-- name: Gal Brener
-  email: galbrener@mail.tau.ac.il
-  photo: Gal.jpg
-  title: Master student
-  info: >
-   Gal is working on the dynamics of deep neural networks. He's using tools from statistical physics to understand 
-   the dynamics of training and generalization in deep neural networks.
 
 - name: Ran Yaacoby
   photo: Ran.jpg
   title: PhD student
   info: >
    Ran is studying the dynamics of deep neural networks.
-
-- name: Noa Eliasi
-  photo: noa.png
-  title: MSc student
-  info: >
-   Noa is studying elasticity of 2D materials, in the context of [slidetronics](https://physicsworld.com/a/slidetronics-makes-its-debut/). 
-   She is co-advised by [Prof. Moshe Ben-Shalom](https://www.qlmgtau.com/).
 
 
 # - name: "This could be you !"
@@ -62,7 +47,7 @@
   email: theo.jules.physics@gmail.com
   education: ["PhD, Ecole Normale Superiéure, Paris, 2020"]
   alumni: true
-  years: 2020-2022
+  year: 2022
   info: >
     Théo is working on understanding the dynamics of deep neural 
     network training using tools from statistical physics (Langevin dynamics, etc.)
@@ -73,7 +58,7 @@
   photo: amit.jpg
   email: afederbush@gmail.com
   alumni: true
-  years: 2020-2023
+  year: 2023
   info: >
     Amit is looking at the random dynamics of interacting colloidal particles
     to see what we can learn about their interactions from their kinematics. 
@@ -83,7 +68,7 @@
 - name: Shachaf Rotem
   photo: shachaf.png
   title: Master student
-  years: 2021-2024
+  year: 2024
   email: shachafrotem@mail.tau.ac.il
   alumni: true
   info: >
@@ -91,3 +76,24 @@
    He's using  [our recently developed formalism](https://doi.org/10.1073/pnas.1920237117), 
    to study disordered metamaterials and understand emergent phenomena such as the collapse
    dynamics, localization properties and more.
+
+
+- name: Gal Brener
+  email: galbrener@mail.tau.ac.il
+  photo: Gal.jpg
+  title: Master student
+  year: 2026
+  alumni: true
+  info: >
+   Gal worked on the dynamics of deep neural networks, using tools from statistical physics to understand
+   the dynamics of training and generalization in deep neural networks.
+
+
+- name: Noa Eliasi
+  photo: noa.png
+  title: Master student
+  year: 2026
+  alumni: true
+  info: >
+   Noa studied elasticity of 2D materials, in the context of [slidetronics](https://physicsworld.com/a/slidetronics-makes-its-debut/).
+   She was co-advised by [Prof. Moshe Ben-Shalom](https://www.qlmgtau.com/).

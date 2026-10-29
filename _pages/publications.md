@@ -13,3 +13,5 @@ nav_order: 3
 {% bibliography %}
 
 </div>
+
+<p class="text-muted small">Like these publications? You can <a href="{{ '/assets/img/tefila.png' | relative_url }}">pray for more</a>.</p>
