@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כפל שרשרת מטריצות: מילוי הטבלה</title>
+<!--
+  Standalone class demo (no Marp): the matrix-chain-multiplication DP on a fixed instance
+  (n=4, p=(20,10,30,40,50)). Steps through the table fill diagonal by diagonal (d=j-i),
+  showing for each cell the cells it reads, every candidate k with real numbers, the
+  minimum, the stored K[i,j], and finally the recursive reconstruction of the
+  parenthesization from K.
+  Keys: → / space / enter = next, ← / backspace = previous, Home = restart, End = last.
+  Deep link: #step=7 opens at a given step.
+  T and K are computed from p below and checked against the verified (tie-free) values:
+  T[1,2]=6000 T[2,3]=12000 T[3,4]=60000 T[1,3]=20000 T[2,4]=32000 T[1,4]=42000,
+  K[1,2]=1 K[2,3]=2 K[3,4]=3 K[1,3]=1 K[2,4]=3 K[1,4]=1. Optimum A((BC)D), 42000. Matrices are named A, B, C, D.
+-->
+<style>
+  :root { --navy:#16325c; --navy-bg:#eaf0f7; --gold:#c8a44d; --gold-bg:#f6ecd2; --gold-ink:#8a6d1d; --red:#b23b3b; --red-bg:#f7e3e3; --gray:#c9ccd1; --ink:#1c1c1c; --muted:#6b7280; }
+  html, body { margin:0; background:#fff; color:var(--ink); font-family: "Helvetica Neue", Arial, "Noto Sans Hebrew", sans-serif; }
+  body { padding: 14px 28px; }
+  h1 { font-size: 1.7em; color: var(--navy); margin: 0 0 10px; font-weight: 700; }
+  .m { direction: ltr; unicode-bidi: isolate; font-family: Georgia, "Times New Roman", serif; font-style: italic; }
+  .m sub, .m sup { font-style: normal; font-size: 0.72em; }
+  .instance { direction: ltr; text-align: center; font-size: 1.5em; color: var(--navy); margin: 4px 0 14px; display:flex; justify-content:center; gap: 44px; flex-wrap: wrap; }
+  .instance .m { font-style: normal; }
+  .instance .m i { font-style: italic; }
+  .instance .chain { font-size: 1.25em; }
+  .instance .dim { font-size: 0.55em; color: var(--muted); vertical-align: sub; margin: 0 0.18em; }
+  /* fixed geometry: the panel's content changes every step, so nothing may depend on its width */
+  .stage { display:flex; flex-direction: column; gap: 10px; align-items: center; direction: ltr; width: max-content; max-width: 100%; margin: 0 auto; }
+  .left { display:flex; flex-direction: column; align-items:center; gap: 8px; flex: none; }
+  table { border-collapse: separate; border-spacing: 5px; font-size: 1.5em; direction: ltr; }
+  th { white-space: nowrap; color: var(--navy); font-weight: 600; font-family: Georgia, serif; font-style: italic; font-size: 0.95em; }
+  th sub { font-style: normal; font-size: 0.72em; }
+  td { position: relative; width: 118px; height: 70px; text-align: center; font-family: Georgia, serif; font-weight: 600; font-size: 1.1em; box-sizing: border-box; }
+  td.unused { background: #f4f4f4; border: 1px solid #e3e3e3; }
+  td.empty { background: #fff; border: 1.5px solid var(--gray); }
+  td.filled { background: var(--navy-bg); border: 1.5px solid var(--navy); }
+  td.read { background: var(--gold-bg); border: 1.5px solid var(--gold); box-shadow: inset 0 0 0 2.5px var(--gold); }
+  td.cur { background: var(--red-bg); border: 1.5px solid var(--red); box-shadow: inset 0 0 0 3px var(--red); }
+  td.onpath { background: var(--red-bg); border: 1.5px solid var(--red); box-shadow: inset 0 0 0 3px var(--red); }
+  td.child { background: var(--gold-bg); border: 1.5px solid var(--gold); box-shadow: inset 0 0 0 2.5px var(--gold); }
+  td .choice { position: absolute; right: 6px; bottom: 3px; font-size: 0.55em; font-weight: bold; color: var(--gold-ink); font-style: italic; line-height: 1; }
+  td .choice sub { font-style: normal; font-size: 0.8em; }
+  .paren { direction: ltr; unicode-bidi: isolate; min-height: 1.3em; line-height: 1.3; font-family: Georgia, serif; font-size: 2em; color: var(--navy); text-align: center; }
+  .paren sub { font-size: 0.65em; }
+  .paren .hot { color: var(--red); }
+  .paren .res { color: var(--ink); margin-left: 0.35em; }
+  .panel { direction: ltr; unicode-bidi: isolate; width: 1000px; min-height: 230px; flex: none; overflow: hidden; font-family: Georgia, "Times New Roman", serif; font-size: 1.3em; color: var(--navy); line-height: 1.55; }
+  .panel sub { font-size: 0.72em; }
+  .panel .subp { font-size: 1.7em; line-height: 1.2; color: var(--red); margin: 2px 0 8px; }
+  .panel .subp .dim { font-size: 0.5em; color: var(--muted); vertical-align: sub; margin: 0 0.18em; font-weight: 400; }
+  .panel .head { font-weight: 700; margin-bottom: 4px; }
+  .panel .line { padding: 2px 10px; border-radius: 6px; white-space: nowrap; }
+  .panel .line .split { display: inline-block; min-width: 5.2em; color: var(--red); }
+  .panel .line.min { background: var(--gold-bg); font-weight: 700; box-shadow: inset 0 0 0 2px var(--gold); }
+  .panel .line.dimmed { color: var(--muted); }
+  .panel .out { margin-top: 8px; font-weight: 700; color: var(--red); }
+  .bar { margin-top: 10px; display:flex; gap: 18px; align-items:center; justify-content:center; direction: ltr; }
+  button { font: inherit; font-size: 1.8em; line-height: 1; width: 72px; height: 56px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; }
+  button:hover { background:#eaf0f7; }
+  .count { color: var(--muted); font-size: 1.1em; min-width: 60px; text-align:center; }
+  .toggle { margin-inline-start: 28px; display:flex; align-items:center; }
+  .toggle input { position:absolute; opacity:0; width:0; height:0; }
+  .toggle .pen { font-size: 1.8em; line-height: 1; width: 72px; height: 56px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; display:flex; align-items:center; justify-content:center; user-select:none; }
+  .toggle input:checked + .pen { background: var(--navy); color: #fff; }
+  .toggle input:focus-visible + .pen { outline: 2px solid var(--gold); }
+</style>
+</head>
+<body>
+<h1>כפל שרשרת מטריצות: מילוי הטבלה וחילוץ הסוגריים</h1>
+
+<div class="instance" id="instance"></div>
+
+<div class="stage">
+  <div class="left">
+    <div><table id="tbl"></table></div>
+    <div class="paren" id="paren"></div>
+  </div>
+  <div class="panel" id="panel"></div>
+</div>
+
+<div class="bar">
+  <button id="reset" title="התחלה">↺</button>
+  <button id="prev" title="הקודם">←</button>
+  <span class="count" id="count"></span>
+  <button id="next" title="הבא">→</button>
+  <label class="toggle" title="זוכרים את הבחירה"><input type="checkbox" id="remember" checked><span class="pen">✎</span></label>
+</div>
+
+<script>
+(function(){
+  // ---------- instance ----------
+  const p = [20, 10, 30, 40, 50];     // A_i is p[i-1] x p[i]
+  const n = p.length - 1;
+
+  // ---------- DP: T[i][j], K[i][j] (1-based, upper triangle) ----------
+  const T = [], K = [];
+  for (let i=0;i<=n;i++){ T.push(new Array(n+1).fill(undefined)); K.push(new Array(n+1).fill(undefined)); }
+  for (let i=1;i<=n;i++) T[i][i]=0;
+  function candidates(i,j){
+    const out=[];
+    for (let k=i;k<=j-1;k++){ const prod=p[i-1]*p[k]*p[j]; out.push({k, a:T[i][k], b:T[k+1][j], prod, sum:T[i][k]+T[k+1][j]+prod}); }
+    return out;
+  }
+  for (let d=1;d<=n-1;d++) for (let i=1;i<=n-d;i++){
+    const j=i+d; const c=candidates(i,j); let best=c[0];
+    for (const x of c) if (x.sum<best.sum) best=x;
+    T[i][j]=best.sum; K[i][j]=best.k;
+  }
+  // check against the verified values
+  const expect = {'1,2':[6000,1],'2,3':[12000,2],'3,4':[60000,3],'1,3':[20000,1],'2,4':[32000,3],'1,4':[42000,1]};
+  for (const key in expect){ const [i,j]=key.split(',').map(Number); console.assert(T[i][j]===expect[key][0] && K[i][j]===expect[key][1], 'T/K mismatch at '+key, T[i][j], K[i][j]); }
+
+  // ---------- markup helpers ----------
+  const sub = (v,i) => v+'<sub>'+i+'</sub>';
+  const A = i => 'ABCDEF'[i-1];        // matrices are named A, B, C, D (not A_1 ...)
+  const Tn = (i,j) => 'T['+i+','+j+']';
+  const Kn = (i,j) => 'K['+i+','+j+']';
+  const pn = i => sub('p',i);
+  const chain = (i,j) => { let s=''; for (let q=i;q<=j;q++) s+=A(q); return s; };
+  const dim = v => '<span class="dim">'+v+'</span>';
+  // handout notation: dims as pre/post subscripts, interior dims written once: _{20}A _{10}B _{30}
+  const chainDims = (i,j) => { let s=dim(p[i-1]); for (let q=i;q<=j;q++) s+=A(q)+dim(p[q]); return s; };
+  const dot = ' · ';
+  const fmt = v => v.toLocaleString('en-US');   // 42000 -> 42,000
+  const grp = (a,b) => { let s=''; for (let q=a;q<=b;q++) s+=A(q); return a===b ? s : '('+s+')'; };
+  function candLine(i,j,c){
+    return 'k = '+c.k+':&nbsp;&nbsp; <span class="split">'+grp(i,c.k)+grp(c.k+1,j)+'</span> '+Tn(i,c.k)+' + '+Tn(c.k+1,j)+' + '+pn(i-1)+pn(c.k)+pn(j)+
+           ' = '+fmt(c.a)+' + '+fmt(c.b)+' + '+p[i-1]+dot+p[c.k]+dot+p[j]+' = '+fmt(c.sum);
+  }
+
+  // ---------- static markup ----------
+  document.getElementById('instance').innerHTML =
+    '<span class="m chain">' + chainDims(1,n) + '</span>' +
+    '<span class="m"><i>p</i> = ('+p.join(', ')+')</span>';
+  const tbl=document.getElementById('tbl'); let html='<tr><th></th>';
+  for (let j=1;j<=n;j++) html+='<th>j = '+j+'</th>';
+  html+='</tr>';
+  for (let i=1;i<=n;i++){ html+='<tr><th>i = '+i+'</th>'; for (let j=1;j<=n;j++) html+='<td id="c-'+i+'-'+j+'"></td>'; html+='</tr>'; }
+  tbl.innerHTML=html;
+
+  // ---------- build steps (full snapshots) ----------
+  const steps=[];
+  const state = { cur:null, reads:[], values:{}, choice:{}, subp:'', head:'', lines:[], out:'', children:[], path:[], paren:'', showRec:true };
+  function snap(){ steps.push(JSON.parse(JSON.stringify(state))); }
+  function key(i,j){ return i+','+j; }
+
+  for (let i=1;i<=n;i++) state.values[key(i,i)]=0;
+  snap();                                                    // step 0: diagonal d=0
+
+  for (let d=1;d<=n-1;d++) for (let i=1;i<=n-d;i++){
+    const j=i+d; const c=candidates(i,j);
+    state.cur=key(i,j);
+    state.reads=[]; for (const x of c){ state.reads.push(key(i,x.k)); state.reads.push(key(x.k+1,j)); }
+    state.subp=Tn(i,j)+':&nbsp; '+chainDims(i,j);
+    state.head='min over k = '+i+', …, '+(j-1)+':';
+    state.lines=c.map(x=>({html:candLine(i,j,x), min:false}));
+    state.out='';
+    snap();                                                  // (a)+(b): read cells, candidates
+    state.lines=c.map(x=>({html:candLine(i,j,x), min:x.k===K[i][j]}));
+    state.values[key(i,j)]=T[i][j]; state.choice[key(i,j)]=K[i][j];
+    state.out=Tn(i,j)+' = '+fmt(T[i][j])+'<span class="kout">,&nbsp;&nbsp; '+Kn(i,j)+' = '+K[i][j]+'</span>';
+    snap();                                                  // (c): value written
+  }
+  state.cur=null; state.reads=[]; state.subp=''; state.head=''; state.lines=[]; state.out=Tn(1,n)+' = '+fmt(T[1][n]);
+  snap();                                                    // completed table
+  const tableDone = steps.length-1;
+
+  // ---------- reconstruction (only when "remember" is on) ----------
+  // parenthesization tree: {i,j,split:null|{k,left,right},applied}
+  const root={i:1,j:n,split:null,applied:false};
+  function render(node,hot,top){
+    if (node.i===node.j) return A(node.i);
+    if (!node.applied){ let s=''; for (let q=node.i;q<=node.j;q++) s+=A(q); return node===hot ? '<span class="hot">'+s+'</span>' : s; }
+    const wrap = ch => ch.i===ch.j ? A(ch.i) : '('+render(ch,hot,false)+')';
+    const body = wrap(node.split.left)+wrap(node.split.right);
+    return (node===hot && !top) ? '<span class="hot">'+body+'</span>' : body;
+  }
+  // visit split nodes depth-first, left child first
+  const order=[]; (function visit(node){ if (node.i===node.j) return; order.push(node); const k=K[node.i][node.j]; node.split={k, left:{i:node.i,j:k,split:null,applied:false}, right:{i:k+1,j:node.j,split:null,applied:false}}; visit(node.split.left); visit(node.split.right); })(root);
+  // replay: a node's split shows in the string only once it has been applied
+  state.showRec=false;
+  for (const nd of order){
+    const i=nd.i, j=nd.j, k=K[i][j];
+    state.cur=key(i,j); state.children=[key(i,k), key(k+1,j)]; state.path.push(key(i,j));
+    state.paren=render(root,nd,true);                        // current chain red, before its split
+    const c=candidates(i,j).filter(x=>x.k===k)[0];
+    state.subp=Tn(i,j)+':&nbsp; '+chainDims(i,j);
+    state.head=Kn(i,j)+' = '+k+':';
+    state.lines=[{html:candLine(i,j,c), min:true}];
+    state.out='('+ (i===k ? A(i) : A(i)+'…'+A(k)) +')(' + (k+1===j ? A(j) : A(k+1)+'…'+A(j)) + ')';
+    snap();
+    nd.applied=true;
+  }
+  state.cur=null; state.children=[]; state.subp=''; state.head=''; state.lines=[]; state.out='';
+  state.paren=render(root,null,true)+'<span class="res"> = '+fmt(T[1][n])+'</span>';
+  snap();                                                    // final: full parenthesization
+
+  // ---------- render ----------
+  let cursor=0;
+  function draw(){
+    const s=steps[cursor]; const rem=document.getElementById('remember').checked;
+    for (let i=1;i<=n;i++) for (let j=1;j<=n;j++){
+      const c=document.getElementById('c-'+i+'-'+j); const k=key(i,j); let cls;
+      if (i>j) cls='unused';
+      else if (s.cur===k) cls='cur';
+      else if (s.children.indexOf(k)>=0) cls='child';
+      else if (s.reads.indexOf(k)>=0) cls='read';
+      else if (s.values[k]!==undefined) cls='filled';
+      else cls='empty';
+      c.className=cls;
+      if (i>j) c.innerHTML='';
+      else if (s.values[k]!==undefined) c.innerHTML = fmt(s.values[k]) + ((rem && s.choice[k]!==undefined) ? '<span class="choice">k = '+s.choice[k]+'</span>' : '');
+      else c.innerHTML='';
+    }
+    let ph = '';
+    if (s.subp) ph += '<div class="subp">'+s.subp+'</div>';
+    if (s.head) ph += '<div class="head">'+s.head+'</div>';
+    for (const l of s.lines) ph += '<div class="line'+(l.min?' min':'')+'">'+l.html+'</div>';
+    if (s.out) ph += '<div class="out">'+(rem ? s.out : s.out.replace(/<span class="kout">.*<\/span>/,''))+'</div>';
+    document.getElementById('panel').innerHTML=ph;
+    document.getElementById('paren').innerHTML = s.paren;
+    document.getElementById('count').textContent = (cursor+1)+' / '+(rem ? steps.length : tableDone+1);
+    location.replace('#step='+cursor);
+  }
+  function last(){ return document.getElementById('remember').checked ? steps.length-1 : tableDone; }
+  function go(j){ cursor=Math.max(0,Math.min(last(),j)); draw(); }
+  document.getElementById('remember').onchange=()=>go(cursor);
+  // buttons drop focus after a click, so a later key press never re-fires the button
+  // (a focused ↺ would otherwise restart on Enter/Space; a focused checkbox would toggle)
+  function btn(id,f){ const b=document.getElementById(id); b.onclick=()=>{ f(); b.blur(); }; }
+  btn('next',()=>go(cursor+1)); btn('prev',()=>go(cursor-1)); btn('reset',()=>go(0));
+  document.getElementById('remember').addEventListener('change',ev=>ev.target.blur());
+  window.addEventListener('keydown',ev=>{
+    if (ev.metaKey||ev.ctrlKey||ev.altKey) return;
+    const k=ev.key;
+    if (k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'){ ev.preventDefault(); ev.stopPropagation(); go(cursor+1); }
+    else if (k==='ArrowLeft'||k==='ArrowUp'||k==='Backspace'||k==='PageUp'){ ev.preventDefault(); ev.stopPropagation(); go(cursor-1); }
+    else if (k==='Home'){ ev.preventDefault(); go(0); } else if (k==='End'){ ev.preventDefault(); go(last()); }
+  }, true);
+  const m=location.hash.match(/step=(\d+)/); go(m?parseInt(m[1]):0);
+})();
+</script>
+</body>
+</html>
