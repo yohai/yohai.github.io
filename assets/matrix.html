@@ -8,7 +8,7 @@
   Standalone class demo (no Marp): the matrix-chain-multiplication DP on a fixed instance
   (n=4, p=(20,10,30,40,50)). Steps through the table fill diagonal by diagonal (d=j-i),
   showing for each cell the cells it reads, every candidate k with real numbers, the
-  minimum, the stored K[i,j], and finally the recursive reconstruction of the
+  minimum, the stored K[i,j], every cell labelled with its matrix chain (e.g. BCD for T[2,3]), and finally the recursive reconstruction of the
   parenthesization from K.
   Keys: → / space / enter = next, ← / backspace = previous, Home = restart, End = last.
   Deep link: #step=7 opens at a given step. Default instance: n=5, p=(6,8,7,4,9,5), optimum (A(BC))(DE)=716,
@@ -25,7 +25,7 @@
   h1 { font-size: 1.6em; color: var(--navy); margin: 0 0 6px; font-weight: 700; }
   .m { direction: ltr; unicode-bidi: isolate; font-family: Georgia, "Times New Roman", serif; font-style: italic; }
   .m sub, .m sup { font-style: normal; font-size: 0.72em; }
-  .instance { direction: ltr; text-align: center; font-size: 1.5em; color: var(--navy); margin: 0 0 6px; display:flex; justify-content:center; gap: 44px; flex-wrap: wrap; }
+  .instance { direction: ltr; text-align: center; font-size: 1.5em; color: var(--navy); margin: 0 0 10px; display:flex; flex-direction: column; align-items:center; gap: 6px; }
   .instance .m { font-style: normal; }
   .instance .m i { font-style: italic; }
   .instance .chain { font-size: 1.25em; }
@@ -36,7 +36,11 @@
   table { border-collapse: separate; border-spacing: 4px; font-size: 1.4em; direction: ltr; }
   th { white-space: nowrap; color: var(--navy); font-weight: 600; font-family: Georgia, serif; font-style: italic; font-size: 0.95em; }
   th sub { font-style: normal; font-size: 0.72em; }
-  td { position: relative; width: 118px; height: 60px; text-align: center; font-family: Georgia, serif; font-weight: 600; font-size: 1.1em; box-sizing: border-box; }
+  td { position: relative; width: 150px; height: 82px; padding-top: 16px; text-align: center; font-family: Georgia, serif; font-weight: 600; font-size: 1.1em; box-sizing: border-box; }
+  /* the chain of matrices the cell stands for, e.g. BCD for T[2,4]; shown on every cell, filled or not */
+  td .chain { position: absolute; left: 0; right: 0; top: 6px; font-size: 0.7em; font-weight: 600; font-style: normal; color: var(--navy); letter-spacing: 0.06em; line-height: 1; }
+  td.cur .chain, td.onpath .chain { color: var(--red); }
+  td.read .chain, td.child .chain { color: var(--gold-ink); }
   td.unused { background: #f4f4f4; border: 1px solid #e3e3e3; }
   td.empty { background: #fff; border: 1.5px solid var(--gray); }
   td.filled { background: var(--navy-bg); border: 1.5px solid var(--navy); }
@@ -44,14 +48,15 @@
   td.cur { background: var(--red-bg); border: 1.5px solid var(--red); box-shadow: inset 0 0 0 3px var(--red); }
   td.onpath { background: var(--red-bg); border: 1.5px solid var(--red); box-shadow: inset 0 0 0 3px var(--red); }
   td.child { background: var(--gold-bg); border: 1.5px solid var(--gold); box-shadow: inset 0 0 0 2.5px var(--gold); }
-  td .choice { position: absolute; right: 6px; bottom: 3px; font-size: 0.55em; font-weight: bold; color: var(--gold-ink); font-style: italic; line-height: 1; }
+  td .choice { position: absolute; right: 7px; bottom: 5px; font-size: 0.6em; font-weight: bold; color: var(--gold-ink); font-style: italic; line-height: 1; }
   td .choice sub { font-style: normal; font-size: 0.8em; }
   .paren { direction: ltr; unicode-bidi: isolate; min-height: 1.3em; line-height: 1.3; font-family: Georgia, serif; font-size: 2em; color: var(--navy); text-align: center; }
   .paren sub { font-size: 0.65em; }
   .paren .hot { color: var(--red); }
   .paren .res { color: var(--ink); margin-left: 0.35em; }
   .row { display:flex; flex-direction: row; align-items: center; gap: 40px; direction: ltr; }
-  .legend { direction: rtl; display:flex; flex-direction: column; gap: 18px; font-size: 1.45em; color: var(--navy); width: 300px; }
+  .side { display:flex; flex-direction: column; justify-content: center; align-self: stretch; width: 300px; flex: none; }
+  .legend { direction: rtl; display:flex; flex-direction: column; gap: 18px; font-size: 1.45em; color: var(--navy); }
   .legend span { display:flex; align-items:center; gap: 12px; }
   .legend .sw { display:inline-block; width: 40px; height: 30px; border-radius: 4px; box-sizing: border-box; flex: none; }
   .legend .sw.cur { background: var(--red-bg); border: 2px solid var(--red); }
@@ -67,13 +72,13 @@
   .panel .line.min { background: var(--gold-bg); font-weight: 700; box-shadow: inset 0 0 0 2px var(--gold); }
   .panel .line.dimmed { color: var(--muted); }
   .panel .out { margin-top: 8px; font-weight: 700; color: var(--red); }
-  .bar { margin-top: 6px; display:flex; gap: 18px; align-items:center; justify-content:center; direction: ltr; }
-  button { font: inherit; font-size: 1.8em; line-height: 1; width: 72px; height: 56px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; }
+  .bar { margin-top: 22px; display:flex; gap: 6px; align-items:center; justify-content:center; direction: ltr; flex-wrap: wrap; }
+  button { font: inherit; font-size: 1.5em; line-height: 1; width: 50px; height: 46px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; }
   button:hover { background:#eaf0f7; }
-  .count { color: var(--muted); font-size: 1.1em; min-width: 60px; text-align:center; }
-  .toggle { margin-inline-start: 28px; display:flex; align-items:center; }
+  .count { color: var(--muted); font-size: 1.05em; min-width: 50px; text-align:center; }
+  .toggle { margin-inline-start: 8px; display:flex; align-items:center; }
   .toggle input { position:absolute; opacity:0; width:0; height:0; }
-  .toggle .pen { font-size: 1.8em; line-height: 1; width: 72px; height: 56px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; display:flex; align-items:center; justify-content:center; user-select:none; }
+  .toggle .pen { font-size: 1.5em; line-height: 1; width: 50px; height: 46px; border: 2px solid var(--navy); background:#fff; color: var(--navy); border-radius: 10px; cursor: pointer; display:flex; align-items:center; justify-content:center; user-select:none; }
   .toggle input:checked + .pen { background: var(--navy); color: #fff; }
   .toggle input:focus-visible + .pen { outline: 2px solid var(--gold); }
 </style>
@@ -81,12 +86,20 @@
 <body>
 <h1>כפל שרשרת מטריצות: מילוי הטבלה וחילוץ הסוגריים</h1>
 
-<div class="instance" id="instance"></div>
-
 <div class="stage">
   <div class="left">
     <div class="row">
-      <div class="legend"><span><i class="sw cur"></i>התא שממלאים</span><span><i class="sw read"></i>התאים שהוא תלוי בהם</span></div>
+      <div class="side">
+        <div class="instance" id="instance"></div>
+        <div class="legend"><span><i class="sw cur"></i>התא שממלאים</span><span><i class="sw read"></i>התאים שהוא תלוי בהם</span></div>
+        <div class="bar">
+          <button id="reset" title="התחלה">↺</button>
+          <button id="prev" title="הקודם">←</button>
+          <span class="count" id="count"></span>
+          <button id="next" title="הבא">→</button>
+          <label class="toggle" title="זוכרים את הבחירה"><input type="checkbox" id="remember" checked><span class="pen">✎</span></label>
+        </div>
+      </div>
       <div><table id="tbl"></table></div>
     </div>
     <div class="paren" id="paren"></div>
@@ -94,13 +107,6 @@
   <div class="panel" id="panel"></div>
 </div>
 
-<div class="bar">
-  <button id="reset" title="התחלה">↺</button>
-  <button id="prev" title="הקודם">←</button>
-  <span class="count" id="count"></span>
-  <button id="next" title="הבא">→</button>
-  <label class="toggle" title="זוכרים את הבחירה"><input type="checkbox" id="remember" checked><span class="pen">✎</span></label>
-</div>
 
 <script>
 (function(){
@@ -226,9 +232,10 @@
       else if (s.values[k]!==undefined) cls='filled';
       else cls='empty';
       c.className=cls;
+      const lbl = '<span class="chain">'+chain(i,j)+'</span>';
       if (i>j) c.innerHTML='';
-      else if (s.values[k]!==undefined) c.innerHTML = fmt(s.values[k]) + ((rem && s.choice[k]!==undefined) ? '<span class="choice">k = '+s.choice[k]+'</span>' : '');
-      else c.innerHTML='';
+      else if (s.values[k]!==undefined) c.innerHTML = lbl + fmt(s.values[k]) + ((rem && s.choice[k]!==undefined) ? '<span class="choice">k = '+s.choice[k]+'</span>' : '');
+      else c.innerHTML=lbl;
     }
     let ph = '';
     if (s.subp) ph += '<div class="subp">'+s.subp+'</div>';
