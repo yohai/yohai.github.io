@@ -34,7 +34,11 @@
   .stage { display:flex; flex-direction: column; gap: 6px; align-items: center; direction: ltr; width: max-content; max-width: 100%; margin: 0 auto; }
   .left { display:flex; flex-direction: column; align-items:center; gap: 8px; flex: none; }
   table { border-collapse: separate; border-spacing: 4px; font-size: 1.4em; direction: ltr; }
-  th { white-space: nowrap; color: var(--navy); font-weight: 600; font-family: Georgia, serif; font-style: italic; font-size: 0.95em; }
+  /* marker over the top-right cell T[1,n]: the answer. Fixed geometry: th height 30 + spacing 4 puts the cell top 38px below the table top */
+  .ans { position: relative; display:flex; direction: rtl; align-items: center; height: 36px; margin: 4px 0 0; font-size: 1.45em; color: var(--red); line-height: 1; }
+  .ans .txt { white-space: nowrap; margin-right: 46px; font-weight: 600; }
+  .ans svg { position: absolute; right: 20px; top: 14px; width: 18px; height: 60px; overflow: visible; }
+  th { height: 30px; white-space: nowrap; color: var(--navy); font-weight: 600; font-family: Georgia, serif; font-style: italic; font-size: 0.95em; }
   th sub { font-style: normal; font-size: 0.72em; }
   td { position: relative; width: 150px; height: 82px; padding-top: 16px; text-align: center; font-family: Georgia, serif; font-weight: 600; font-size: 1.1em; box-sizing: border-box; }
   /* the chain of matrices the cell stands for, e.g. BCD for T[2,4]; shown on every cell, filled or not */
@@ -100,7 +104,7 @@
           <label class="toggle" title="זוכרים את הבחירה"><input type="checkbox" id="remember" checked><span class="pen">✎</span></label>
         </div>
       </div>
-      <div><table id="tbl"></table></div>
+      <div><div class="ans"><span class="txt">זאת התשובה שאנחנו מחפשים</span><svg viewBox="0 0 18 60" aria-hidden="true"><path d="M9 2 V50" stroke="#b23b3b" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M1 46 L9 58 L17 46 Z" fill="#b23b3b"/></svg></div><table id="tbl"></table></div>
     </div>
     <div class="paren" id="paren"></div>
   </div>
