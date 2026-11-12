@@ -28,7 +28,8 @@
   photo: Ran.jpg
   title: PhD student
   info: >
-   Ran is studying the dynamics of deep neural networks.
+   Ran is studying the training dynamics of neural networks with tools from statistical physics and dynamical systems.
+   His current focus is on dynamics of generalization in shallow phase retrieval, a simple learning problem with a rough, glassy loss landscape.
 
 - name: Sagi Rajwan
   photo: sagi.jpg
