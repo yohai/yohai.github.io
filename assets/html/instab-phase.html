@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batman instabilities</title>
+<!-- Interactive phase diagram of the three instabilities of a straight domain wall on a power-law flank.
+     Port of figures/batman/instab_phase_gui.py (model: instab_phase.py) in the isf-slap repo.
+     Single file; the only external dependency is Plotly from the CDN below. -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<style>
+  :root { --fg: #222; --bg: #fff; --muted: #666; --rule: #ddd; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; }
+  #wrap { max-width: 1280px; margin: 0 auto; padding: 12px 16px 24px; }
+  p.caption { margin: 4px 0 10px; line-height: 1.45; }
+  #fig { width: 100%; height: 560px; }
+  #controls { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px 28px; margin-top: 8px;
+    padding-top: 10px; border-top: 1px solid var(--rule); align-items: start; }
+  .group { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; }
+  .group h4 { grid-column: 1 / -1; margin: 0 0 2px; font-size: 12px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .04em; }
+  .group label { white-space: nowrap; }
+  .group input[type=range] { width: 100%; min-width: 120px; margin: 0; }
+  .group output { font-variant-numeric: tabular-nums; min-width: 6em; text-align: right; }
+  .group .off { opacity: .35; }
+  .radios { display: grid; gap: 6px; }
+  .radios label { display: block; white-space: nowrap; }
+  .radios label:first-of-type { margin-top: 2px; }
+  #ck { grid-column: 1 / -1; margin-top: 4px; }
+  i { font-family: "Times New Roman", Times, serif; }
+  @media (max-width: 900px) { #controls { grid-template-columns: 1fr; } #fig { height: 900px; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+<p class="caption">Three instabilities of a straight domain wall in a batman cavity with a power-law flank
+<i>h</i>(<i>s</i>) = <i>y</i><sub>0</sub> + (<i>H</i> &minus; <i>y</i><sub>0</sub>)(<i>s</i>/<i>W</i>)<sup><i>p</i></sup>:
+bowing (B, <i>h</i>&prime; &gt; 2 &minus; 2&gamma;<sub>out</sub>/&gamma;<sub>t</sub>), sliding (S, first maximum of <i>G</i>),
+over the top (O). Colour: mechanism; contours: critical field <i>D</i><sub>c</sub> (V/nm).
+Model: Yohai Bar-Sinai, Nov 2026.</p>
+
+<div id="fig"></div>
+
+<div id="controls">
+  <div class="group" id="fixed">
+    <h4>Fixed parameters</h4>
+    <label for="sl_H"><i>H</i> (nm)</label><input type="range" id="sl_H" min="150" max="600" step="1" value="280"><output id="out_H"></output>
+    <label for="sl_y0"><i>y</i><sub>0</sub> (nm)</label><input type="range" id="sl_y0" min="40" max="300" step="1" value="140"><output id="out_y0"></output>
+    <label for="sl_W"><i>W</i> (nm)</label><input type="range" id="sl_W" min="50" max="500" step="1" value="150"><output id="out_W"></output>
+    <label for="sl_beta">log<sub>10</sub> &beta;</label><input type="range" id="sl_beta" min="0" max="4" step="0.01" value="2"><output id="out_beta"></output>
+  </div>
+  <div class="group" id="star">
+    <h4>Star</h4>
+    <label for="sl_p"><i>p</i> (star)</label><input type="range" id="sl_p" min="1" max="4" step="0.01" value="1.5"><output id="out_p"></output>
+    <label for="sl_y" id="lab_y">y (star)</label><input type="range" id="sl_y"><output id="out_y"></output>
+    <label id="ck"><input type="checkbox" id="ck_contours" checked> <i>D</i><sub>c</sub> contours</label>
+  </div>
+  <div class="radios" id="radios">
+    <h4 style="margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">y axis</h4>
+    <label><input type="radio" name="yaxis" value="H" checked> <i>H</i></label>
+    <label><input type="radio" name="yaxis" value="y0"> <i>y</i><sub>0</sub></label>
+    <label><input type="radio" name="yaxis" value="W"> <i>W</i></label>
+    <label><input type="radio" name="yaxis" value="beta"> &beta;</label>
+  </div>
+</div>
+</div>
+
+<script id="model">
+// MODEL-BEGIN  (no DOM here: this block is also run under node by the test)
+// Port of instab_phase.py. Flank h(s) = y0 + (H - y0)(s/W)^p, u = s/W in [0, 1].
+const GT = 1.037, GS = 0.647;              // gamma_t, gamma_s (eV/nm)
+const RATIO = GS / GT;                      // gamma_s/gamma_t = 0.624
+const DELTA_PER_D = 1.1585e-2;              // eV/nm^2 per V/nm
+const MECH = ['S', 'B', 'O'];
+const WORD = ['Sliding', 'Bowing', 'Over the top'];
+const COL  = ['#0072B2', '#D55E00', '#009E73'];   // S blue, B vermillion, O green
+
+function r_of(beta) { return RATIO / Math.sqrt(beta); }   // gamma_out/gamma_t
+
+function hOf(u, p, y0, A) { return y0 + A * Math.pow(u, p); }
+function hpOf(u, p, A, W) { return A * p * Math.pow(u > 0 ? u : 1e-300, p - 1) / W; }
+function G(u, p, y0, H, W, r) {
+  const A = H - y0;
+  return GT * (hpOf(u, p, A, W) + 2 * r) / hOf(u, p, y0, A) / DELTA_PER_D;
+}
+
+// flank fraction where h' = 2 - 2r; NaN if never reached before the crest
+function u_B(p, y0, H, W, r) {
+  const A = H - y0, kappa = 2 - 2 * r;
+  const u = Math.pow(kappa * W / (A * p), 1 / (p - 1));
+  return (u <= 1 && p > 1) ? u : NaN;
+}
+
+// flank fraction of the first maximum of G (h = p y0 - 2 r W u); NaN if G increases up to the crest
+function u_S(p, y0, H, W, r, iters) {
+  iters = iters || 50;
+  const A = H - y0;
+  const f = u => y0 + A * Math.pow(u, p) - p * y0 + 2 * r * W * u;   // <0 stable, crosses 0 once
+  let lo = 0, hi = 1;
+  if (!(f(hi) > 0 && f(lo) < 0)) return NaN;
+  for (let i = 0; i < iters; i++) {
+    const mid = 0.5 * (lo + hi);
+    if (f(mid) > 0) hi = mid; else lo = mid;
+  }
+  return 0.5 * (lo + hi);
+}
+
+// returns {code 0/1/2 = S/B/O, u of the instability, Dc in V/nm}
+function mechanism(p, y0, H, W, r) {
+  const uS = u_S(p, y0, H, W, r), uB = u_B(p, y0, H, W, r);
+  const hasS = !Number.isNaN(uS), hasB = !Number.isNaN(uB);
+  let code = 2;
+  if (hasB) code = 1;
+  if (hasS && (!hasB || uS < uB)) code = 0;
+  const u = code === 0 ? uS : (code === 1 ? uB : 1.0);
+  return { code: code, u: u, Dc: G(u, p, y0, H, W, r) };
+}
+
+const PARAMS = {   // name: label (Plotly HTML), default, range, log axis
+  H:    { label: '<i>H</i> (nm)',             def: 280, range: [150, 600], log: false },
+  y0:   { label: '<i>y</i><sub>0</sub> (nm)', def: 140, range: [40, 300],  log: false },
+  W:    { label: '<i>W</i> (nm)',             def: 150, range: [50, 500],  log: false },
+  beta: { label: 'β',                          def: 100, range: [1, 1e4],   log: true  },
+};
+
+function linspace(a, b, n) { const o = new Array(n); for (let i = 0; i < n; i++) o[i] = a + (b - a) * i / (n - 1); return o; }
+function geomspace(a, b, n) { const la = Math.log(a), lb = Math.log(b); const o = new Array(n); for (let i = 0; i < n; i++) o[i] = Math.exp(la + (lb - la) * i / (n - 1)); return o; }
+
+// mechanism code and Dc on the (p, yname) grid; rows are y
+function phaseGrid(yname, fixed, n) {
+  n = n || 300;
+  const P = PARAMS[yname];
+  const p = linspace(1, 4, n);
+  const y = P.log ? geomspace(P.range[0], P.range[1], n) : linspace(P.range[0], P.range[1], n);
+  const code = new Array(n), Dc = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const kw = Object.assign({}, fixed); kw[yname] = y[i];
+    const r = r_of(kw.beta);
+    const rc = new Array(n), rd = new Array(n);
+    for (let j = 0; j < n; j++) {
+      const m = mechanism(p[j], kw.y0, kw.H, kw.W, r);
+      rc[j] = m.code; rd[j] = m.Dc;
+    }
+    code[i] = rc; Dc[i] = rd;
+  }
+  return { p: p, y: y, code: code, Dc: Dc };
+}
+
+// Exact Euclidean distance transform (Felzenszwalb & Huttenlocher), squared distances.
+function edt1d(f, n, d, v, z) {
+  let k = 0; v[0] = 0; z[0] = -1e300; z[1] = 1e300;
+  for (let q = 1; q < n; q++) {
+    let s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    while (s <= z[k]) { k--; s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]); }
+    k++; v[k] = q; z[k] = s; z[k + 1] = 1e300;
+  }
+  k = 0;
+  for (let q = 0; q < n; q++) { while (z[k + 1] < q) k++; d[q] = (q - v[k]) * (q - v[k]) + f[v[k]]; }
+}
+// mask: n x n array of 0/1 (padded by one background cell, so the frame counts as boundary).
+// returns {dmax, i, j} of the deepest interior point (unpadded indices)
+function deepestPoint(mask, n) {
+  const N = n + 2, BIG = 1e9;
+  const g = new Float64Array(N * N);
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++)
+    g[i * N + j] = (i > 0 && i <= n && j > 0 && j <= n && mask[i - 1][j - 1]) ? BIG : 0;
+  const f = new Float64Array(N), d = new Float64Array(N), v = new Int32Array(N), z = new Float64Array(N + 1);
+  for (let j = 0; j < N; j++) {               // columns
+    for (let i = 0; i < N; i++) f[i] = g[i * N + j];
+    edt1d(f, N, d, v, z);
+    for (let i = 0; i < N; i++) g[i * N + j] = d[i];
+  }
+  let best = -1, bi = 0, bj = 0;
+  for (let i = 0; i < N; i++) {               // rows
+    for (let j = 0; j < N; j++) f[j] = g[i * N + j];
+    edt1d(f, N, d, v, z);
+    for (let j = 0; j < N; j++) if (d[j] > best) { best = d[j]; bi = i; bj = j; }
+  }
+  return { dmax: Math.sqrt(best), i: bi - 1, j: bj - 1 };
+}
+// MODEL-END
+</script>
+
+<script>
+(function () {
+  const names = ['H', 'y0', 'W', 'beta'];
+  const $ = id => document.getElementById(id);
+  const state = { yname: 'H', pending: false };
+  const fmt3g = v => Number(v.toPrecision(3)).toString();
+
+  function sliderVal(k) {
+    const v = +$('sl_' + k).value;
+    return PARAMS[k].log ? Math.pow(10, v) : v;
+  }
+  function starY() {
+    const v = +$('sl_y').value;
+    return PARAMS[state.yname].log ? Math.pow(10, v) : v;
+  }
+  function setupStarY(k) {          // reset the star's y slider to the range and default of the axis parameter
+    const P = PARAMS[k], sl = $('sl_y');
+    if (P.log) { sl.min = Math.log10(P.range[0]); sl.max = Math.log10(P.range[1]); sl.step = 0.01; sl.value = Math.log10(P.def); }
+    else { sl.min = P.range[0]; sl.max = P.range[1]; sl.step = (P.range[1] - P.range[0]) / 1000; sl.value = P.def; }
+    $('lab_y').innerHTML = (P.log ? 'log<sub>10</sub> ' : '') + P.label + ' (star)';
+  }
+  function readouts() {
+    for (const k of names) $('out_' + k).textContent = PARAMS[k].log ? 'β = ' + fmt3g(sliderVal(k)) : fmt3g(sliderVal(k));
+    $('out_p').textContent = (+$('sl_p').value).toFixed(2);
+    $('out_y').textContent = fmt3g(starY());
+  }
+
+  const serif = 'CMU Serif, "Times New Roman", Times, serif';
+  const n = 300;
+
+  function build() {
+    const yname = state.yname, P = PARAMS[yname];
+    const fixed = {}; for (const k of names) fixed[k] = sliderVal(k);
+    const pstar = +$('sl_p').value, ystar = starY();
+    const kw = Object.assign({}, fixed); kw[yname] = ystar;
+    const contours = $('ck_contours').checked;
+
+    // ---- left: phase map ----
+    const g = phaseGrid(yname, fixed, n);
+    const text = g.code.map((row, i) => row.map((c, j) => MECH[c] + ', <i>D</i><sub>c</sub> = ' + g.Dc[i][j].toFixed(2) + ' V/nm'));
+    const traces = [{
+      type: 'heatmap', x: g.p, y: g.y, z: g.code, text: text,
+      colorscale: [[0, COL[0]], [1 / 3, COL[0]], [1 / 3, COL[1]], [2 / 3, COL[1]], [2 / 3, COL[2]], [1, COL[2]]],
+      zmin: -0.5, zmax: 2.5, zsmooth: false, opacity: 0.55, showscale: false,
+      hovertemplate: '<i>p</i> = %{x:.2f}<br>' + P.label + ' = %{y:.3g}<br>%{text}<extra></extra>',
+    }];
+    if (contours) traces.push({
+      type: 'contour', x: g.p, y: g.y, z: g.Dc,
+      contours: { coloring: 'none', showlabels: true, start: 0.2, end: 2.0, size: 0.1,
+                  labelfont: { size: 9, color: '#000' }, labelformat: '.1f' },
+      line: { color: '#000', width: 0.7 }, showscale: false, hoverinfo: 'skip', showlegend: false,
+    });
+    traces.push({
+      type: 'scatter', mode: 'markers', x: [pstar], y: [ystar], showlegend: false, hoverinfo: 'skip',
+      marker: { symbol: 'star', size: 17, color: '#000', line: { color: '#fff', width: 1 } },
+    });
+    const annotations = [];
+    for (let k = 0; k < 3; k++) {
+      const mask = g.code.map(row => row.map(c => c === k ? 1 : 0));
+      const dp = deepestPoint(mask, n);
+      if (dp.dmax < 0.04 * n) continue;                // too thin a region for a word
+      const yv = g.y[dp.i];
+      annotations.push({ x: g.p[dp.j], y: P.log ? Math.log10(yv) : yv, xref: 'x', yref: 'y', text: WORD[k],
+        showarrow: false, font: { family: serif, size: 16, color: '#000' } });
+    }
+    annotations.push({ xref: 'x domain', yref: 'y domain', x: 0.5, y: 1.0, yanchor: 'bottom', yshift: 4, showarrow: false,
+      font: { size: 11 },
+      text: names.filter(k => k !== yname).map(k => PARAMS[k].label + ' = ' + fmt3g(fixed[k])).join(', ') });
+
+    // ---- right: the star's flank ----
+    const p = pstar, y0 = kw.y0, H = kw.H, W = kw.W, r = r_of(kw.beta), A = H - y0;
+    const m = 2000, s = new Array(m), h = new Array(m), Gs = new Array(m), ceil = new Array(m);
+    for (let i = 0; i < m; i++) {
+      const u = i / (m - 1); s[i] = u * W; h[i] = hOf(u, p, y0, A);
+      Gs[i] = GT * (hpOf(u, p, A, W) + 2 * r) / h[i] / DELTA_PER_D;
+      ceil[i] = 2 * GT / h[i] / DELTA_PER_D;
+    }
+    const mc = mechanism(p, y0, H, W, r);
+    const sc = mc.u * W, hc = hOf(mc.u, p, y0, A), Dc = mc.Dc, col = COL[mc.code];
+    traces.push(
+      { type: 'scatter', mode: 'lines', x: s, y: h, xaxis: 'x2', yaxis: 'y2', line: { color: '#000', width: 1.5 },
+        showlegend: false, hovertemplate: '<i>s</i> = %{x:.0f} nm<br><i>h</i> = %{y:.0f} nm<extra></extra>' },
+      { type: 'scatter', mode: 'markers', x: [sc], y: [hc], xaxis: 'x2', yaxis: 'y2',
+        marker: { color: col, size: 11 }, showlegend: false, hoverinfo: 'skip' },
+      { type: 'scatter', mode: 'lines', x: s, y: Gs, xaxis: 'x3', yaxis: 'y3', line: { color: '#000', width: 1.5 },
+        name: '<i>G</i>', hovertemplate: '<i>s</i> = %{x:.0f} nm<br><i>G</i> = %{y:.2f} V/nm<extra></extra>' },
+      { type: 'scatter', mode: 'lines', x: s, y: ceil, xaxis: 'x3', yaxis: 'y3', line: { color: '#000', width: 1.2, dash: 'dot' },
+        name: '2γ<sub>t</sub>/<i>h</i>', hoverinfo: 'skip' },
+      { type: 'scatter', mode: 'markers', x: [sc], y: [Dc], xaxis: 'x3', yaxis: 'y3',
+        marker: { color: col, size: 11 }, showlegend: false, hoverinfo: 'skip' },
+    );
+    annotations.push({ xref: 'x3 domain', yref: 'y3 domain', x: 0.5, y: 1.0, yanchor: 'bottom', yshift: 4, showarrow: false,
+      font: { size: 11 },
+      text: MECH[mc.code] + ' at <i>s</i> = ' + sc.toFixed(0) + ' nm, <i>h</i> = ' + hc.toFixed(0) + ' nm, <i>D</i><sub>c</sub> = ' + Dc.toFixed(2) + ' V/nm' });
+
+    const layout = {
+      margin: { l: 60, r: 16, t: 30, b: 48 },
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      font: { family: '"Helvetica Neue", Helvetica, Arial, sans-serif', size: 12, color: '#222' },
+      xaxis:  { domain: [0, 0.56], anchor: 'y', title: { text: '<i>p</i>' }, range: [1, 4], zeroline: false, mirror: true, showline: true, linecolor: '#444', ticks: 'outside' },
+      yaxis:  { anchor: 'x', title: { text: P.label }, type: P.log ? 'log' : 'linear', exponentformat: 'power',
+                range: P.log ? [Math.log10(P.range[0]), Math.log10(P.range[1])] : [P.range[0], P.range[1]],
+                zeroline: false, mirror: true, showline: true, linecolor: '#444', ticks: 'outside' },
+      xaxis2: { domain: [0.66, 1], anchor: 'y2', range: [0, W], showticklabels: false, mirror: true, showline: true, linecolor: '#444', ticks: 'outside', zeroline: false },
+      yaxis2: { domain: [0.58, 1], anchor: 'x2', title: { text: '<i>h</i> (nm)' }, mirror: true, showline: true, linecolor: '#444', ticks: 'outside', zeroline: false, rangemode: 'tozero' },
+      xaxis3: { domain: [0.66, 1], anchor: 'y3', range: [0, W], title: { text: '<i>s</i> from the neck (nm)' }, mirror: true, showline: true, linecolor: '#444', ticks: 'outside', zeroline: false },
+      yaxis3: { domain: [0, 0.42], anchor: 'x3', title: { text: '<i>D</i> (V/nm)' }, range: [0, Math.max(2.0, Dc * 1.2)], mirror: true, showline: true, linecolor: '#444', ticks: 'outside', zeroline: false },
+      legend: { x: 0.99, y: 0.41, xanchor: 'right', yanchor: 'top', bgcolor: 'rgba(255,255,255,0.6)', font: { size: 11 } },
+      showlegend: true,
+      annotations: annotations,
+      hovermode: 'closest',
+    };
+    return { traces: traces, layout: layout };
+  }
+
+  function redraw() {
+    if (state.pending) return;
+    state.pending = true;
+    requestAnimationFrame(() => {
+      state.pending = false;
+      readouts();
+      const b = build();
+      Plotly.react($('fig'), b.traces, b.layout, { responsive: true, displayModeBar: false });
+    });
+  }
+
+  function onRadio(k) {
+    state.yname = k;
+    setupStarY(k);
+    for (const q of names) {
+      const sl = $('sl_' + q), off = q === k;
+      sl.disabled = off;
+      sl.classList.toggle('off', off);
+      sl.previousElementSibling.classList.toggle('off', off);
+      sl.nextElementSibling.classList.toggle('off', off);
+    }
+    redraw();
+  }
+
+  for (const k of names) $('sl_' + k).addEventListener('input', redraw);
+  $('sl_p').addEventListener('input', redraw);
+  $('sl_y').addEventListener('input', redraw);
+  $('ck_contours').addEventListener('change', redraw);
+  for (const rb of document.querySelectorAll('input[name=yaxis]')) rb.addEventListener('change', e => onRadio(e.target.value));
+
+  window.addEventListener('load', () => {        // #y=beta (or H, y0, W) picks the initial y axis
+    const m = /y=(H|y0|W|beta)/.exec(location.hash);
+    const k = m ? m[1] : 'H';
+    document.querySelector('input[name=yaxis][value=' + k + ']').checked = true;
+    onRadio(k);
+  });
+})();
+</script>
+</body>
+</html>
